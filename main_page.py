@@ -13,6 +13,6 @@ st.markdown("""
             and it has all five noun declensions 
             and all four verb moods (indicative, subjunctive, imperative, and infinitive).
 
-            🚧 As the site construction is currently in progress, only nouns are functional!
+            🚧 As the site construction is currently in progress, only nouns and verbs **(NEW!)** are functional! Work is underway on adding additional irregular verbs. (Next up will be pronouns, followed by adjectives.)
 
             """)
