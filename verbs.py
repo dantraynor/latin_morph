@@ -747,7 +747,7 @@ else:
         if not st.session_state.question_generation_error_message:
             st.markdown("### Current question")
 
-            with st.form(key="noun_form", clear_on_submit=True):
+            with st.form(key="verb_answer_form", clear_on_submit=True):
                 current_answer = st.text_input(question, key="answer_input")
 
                 submit_button_col, user_answer_col = st.columns(2)
@@ -776,4 +776,4 @@ else:
         # reset() defined in utils.py
         st.button("Reset Score", "reset", on_click=reset, width="stretch")
 
-        st.markdown(f"Current score: {st.session_state.current_score} out of {st.session_state.total_questions}")
+        st.markdown(f"Current score: **{st.session_state.current_score}** out of **{st.session_state.total_questions}**")

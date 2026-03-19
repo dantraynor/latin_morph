@@ -304,4 +304,4 @@ with score_col:
     # reset() defined in utils.py
     st.button("Reset Score", "reset", on_click=reset, width="stretch")
 
-    st.markdown(f"Current score: {st.session_state.current_score} out of {st.session_state.total_questions}")
+    st.markdown(f"Current score: **{st.session_state.current_score}** out of **{st.session_state.total_questions}**")
