@@ -67,6 +67,59 @@ def import_verbs():
             "fap": "futūr",
             "pap": None
             },
+        "possum": {
+            "voice": "act",
+            "conj": None,
+            "no_impv": True,
+            "irreg": {
+                "forms": {
+                    "pres": {
+                        "act": {
+                            "ind": {
+                                "sg": {1: "possum",
+                                        2: "potes",
+                                        3: "potest"},
+                                "pl": {1: "possumus",
+                                        2: "potestis",
+                                        3: "possunt"}},
+                            "subj": {"sg": {1: "possim",
+                                            2: "possīs",
+                                            3: "possit"},
+                                    "pl": {1: "possīmus",
+                                            2: "possītis",
+                                            3: "possint"}},
+                            "inf": "posse"}
+                            },
+                    "impf": {
+                        "act": {
+                            "ind": {
+                                "sg": {1: "poteram",
+                                    2: "poterās",
+                                    3: "poterat"},
+                                "pl": {1: "poterāmus",
+                                        2: "poterātis",
+                                        3: "poterant"}
+                                }
+                            }
+                        },
+                    "fut": {
+                        "act": {
+                            "ind": {
+                                "sg": {1: "poterō",
+                                        2: "poteris",
+                                        3: "poterit"},
+                                "pl": {1: "poterimus",
+                                        2: "poteritis",
+                                        3: "poterunt"}
+                            },
+                        }
+                    },                
+                }
+            },
+            # regular information
+            "perf": "potu",
+            "pap": "potēns"
+            },
         "ferō": {
             "voice": "act",
             "conj": 3,
@@ -217,8 +270,148 @@ def import_verbs():
             "perf": "īv", # need to figure out how to do alternative forms of perfect
             "ppp": "it"
         },
+        "volō": {
+            "voice": "act",
+            "conj": 3,
+            "no_impv": True,
+            "irreg": {
+                "forms": {
+                    "pres": {
+                        "act": {
+                            "ind": {
+                                "sg": {
+                                    1: "volō",
+                                    2: "vīs",
+                                    3: "vult"
+                                },
+                                "pl": {
+                                    1: "volumus",
+                                    2: "vultis",
+                                    3: "volunt"
+                                }
+                            },
+                            "subj": {
+                                "sg": {
+                                    1: "velim",
+                                    2: "velīs",
+                                    3: "velit"
+                                },
+                                "pl": {
+                                    1: "velīmus",
+                                    2: "velītis",
+                                    3: "velint"
+                                }
+                            },
+                            "inf": "velle"
+                        }
+                    }
+                }
+            },
+            "pres": "vol",
+            "perf": "volu",
+            "pap": "volēns"
+        },
+        "nōlō": {
+            "voice": "act",
+            "conj": 3,
+            "irreg": {
+                "forms": {
+                    "pres": {
+                        "act": {
+                            "ind": {
+                                "sg": {
+                                    1: "nōlō",
+                                    2: "nōn vīs",
+                                    3: "nōn vult"
+                                },
+                                "pl": {
+                                    1: "nōlumus",
+                                    2: "nōn vultis",
+                                    3: "nōlunt"
+                                }
+                            },
+                            "subj": {
+                                "sg": {
+                                    1: "nōlim",
+                                    2: "nōlīs",
+                                    3: "nōlit"
+                                },
+                                "pl": {
+                                    1: "nōlīmus",
+                                    2: "nōlītis",
+                                    3: "nōlint"
+                                }
+                            },
+                            "inf": "nōlle",
+                            "impv": {
+                                "sg": {2: "nōlī"},
+                                "pl": {2: "nōlīte"}
+                            }
+                        }
+                    },
+                    "fut": {
+                        "act": {
+                            "impv": {
+                                "sg": {
+                                    2: "nōlītō",
+                                    3: "nōlītō"
+                                },
+                                "pl": {
+                                    2: "nōlītōte",
+                                    3: "nōluntō"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "pres": "nōl",
+            "perf": "nōlu",
+            "pap": "nōlēns"
+        },
+        "mālō": {
+            "voice": "act",
+            "conj": 3,
+            "no_impv": True,
+            "irreg": {
+                "forms": {
+                    "pres": {
+                        "act": {
+                            "ind": {
+                                "sg": {
+                                    1: "mālō",
+                                    2: "māvīs",
+                                    3: "māvult"
+                                },
+                                "pl": {
+                                    1: "mālumus",
+                                    2: "māvultis",
+                                    3: "mālunt"
+                                }
+                            },
+                            "subj": {
+                                "sg": {
+                                    1: "mālim",
+                                    2: "mālīs",
+                                    3: "mālit"
+                                },
+                                "pl": {
+                                    1: "mālīmus",
+                                    2: "mālītis",
+                                    3: "mālint"
+                                }
+                            },
+                            "inf": "mālle"
+                        }
+                    }
+                }
+            },
+            "pres": "māl",
+            "perf": "mālu",
+            "pap": None
+        },
 
-        # add irregular verbs: possum, fio, volo, nolo, malo
+        # add irregular verbs: fio
 
         ## REGULAR VERBS
 

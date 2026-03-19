@@ -18,9 +18,15 @@ def reset():
 
 def new_question(gen_question):
     # n.b. `gen_question()` may have a different name depending on page.
-    st.session_state.current_question = gen_question()
-    st.session_state.answer_checked = False
-    st.session_state.answer_to_check = ""
+    try:
+        st.session_state.current_question = gen_question()
+        st.session_state.answer_checked = False
+        st.session_state.answer_to_check = ""
+    except:
+        # st.write("Your selected options have resulted in an impossibility: try selecting some additional options.")
+        return
+#    else:
+
 
 def remove_macrons(text):
     for macron, vowel in {"ā": "a",
@@ -39,7 +45,7 @@ def check_answer():
         if st.session_state.check_answer_button:
 
             if isinstance(st.session_state["correct_answer"], list):
-                st.write("The correct answers are:", " or ".join(st.session_state["correct_answer"]))
+                st.write("The correct answers are:", " *or* ".join(st.session_state["correct_answer"]))
                 for i, answer in enumerate(st.session_state["correct_answer"]):
                     st.session_state["correct_answer"][i] = unicodedata.normalize("NFC", answer)
             else:

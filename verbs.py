@@ -106,6 +106,7 @@ with verb_options_col:
                                 format_func=lambda x: mood_dict[x],
                                 default=master_mood_list)
 
+
 # with irreg_col:
     #master_irregular_verbs_list = ["sum", "possum", "eō", "ferō", "fīō", "volō", "nōlō", "mālō"]
     master_irregular_verbs_list = [key for key in complete_verb_vocab.keys() if complete_verb_vocab[key].get("irreg")]
@@ -116,9 +117,12 @@ with verb_options_col:
                                     default=master_irregular_verbs_list,
                                     help="Selected irregular verbs will be available regardless of any other selections.")
 
+
     fut_impv = False
     if "fut" in tense_selector and "impv" in mood_selector:
         fut_impv = st.checkbox("Include future imperatives?", help="Future imperatives are very rare and not usually taught in introductory or intermediate courses, but you can include them if you want to!")
+    if st.session_state.question_generation_error_message:
+        st.write(st.session_state.question_generation_error_message)
 
 ## DEFINE AVAILABLE VERBS AND VERB ENDINGS ##
 
@@ -338,6 +342,9 @@ for feature, feature_list in zip(["voice","conj"],[voice_selector,conjugation_se
     verb_vocab = {key: val for key, val in verb_vocab.items() if (verb_vocab[key][feature] in feature_list) or (key in irreg_selector)}
 if "act" not in voice_selector:
     verb_vocab = {key: val for key, val in verb_vocab.items() if not verb_vocab[key].get("impers_pass_only")}
+if mood_selector == ["impv"]:
+    verb_vocab = {key: val for key, val in verb_vocab.items() if not verb_vocab[key].get("no_impv")}
+
 
 if len(verb_vocab) == 0:
     st.write("Based on your selections, there are no available verbs to generate forms for.")
@@ -347,17 +354,23 @@ elif len(voice_selector) == 0:
     st.write("You need to choose at least one voice.")
 elif len(mood_selector) == 0:
     st.write("You need to choose at least one mood.")
+#    st.session_state.question_generation_error_message = ""
 elif len(mood_list) == 0:
     st.write("Based on your selections, it is not possible to generate any valid verb forms.")
 
 else:
 
     def gen_verb_id():
-            
+        st.session_state.question_generation_error_message = ""
         verb = random.choice(list(verb_vocab.keys()))
     #    verb = "eō"    ## UNCOMMENT AND SET FOR TESTING
 
         # SET MOOD
+        if verb_vocab[verb].get("no_impv"):
+            mood_list.pop("impv")
+        if not mood_list:
+            st.session_state.question_generation_error_message = ":warning: Your selected options have resulted in an impossibility! Try selecting some different or additional options and hit 'New Question' again."
+
         mood = random.choices(list(mood_list.keys()), list(mood_list.values()))[0]
     #    mood = "ind"    ## UNCOMMENT AND SET FOR TESTING
         
@@ -371,6 +384,10 @@ else:
             for tns in ["impf","plupf","fut_pf"]:
                 if tns in tense_list:
                     tense_list.remove(tns)
+            if not (verb_vocab[verb].get("ppp") or verb_vocab[verb].get("fap")):
+                tense_list.remove("fut")
+        # if not tense_list:
+        #     st.session_state.question_generation_error_message = ":warning: Your selected options have resulted in an impossibility! Try selecting some different options and hit 'New Question' again."
 
         if mood == "impv":
             if "pres" in tense_list and "fut" in tense_list and fut_impv:
@@ -413,7 +430,7 @@ else:
         ## only if verb is active (or semidep?)
         if verb_vocab[verb]["voice"] == "act" and not voice:
 
-            if verb in ["sum","possum"]:
+            if verb in ["sum","possum","volō","nōlō","mālō"]:
                 voice = "act"
 
             # may need to move impersonal passive logic elsewhere to accommodate semideponents:
@@ -722,40 +739,39 @@ else:
 
         questions_asked.append(verb_id)
 
-        question = f"Give the {", ".join([item for item in [verb_abbrevs.get(person)+" person" if person else "", verb_abbrevs.get(number) if number else "", verb_abbrevs[tense], verb_abbrevs[voice], verb_abbrevs[mood]] if item])} of *{verb}*."
+        question = f"Give the {", ".join([item for item in [verb_abbrevs.get(person)+" person" if person else "", verb_abbrevs.get(number) if number else "", verb_abbrevs[tense], verb_abbrevs[voice] if voice != "dep" else "", verb_abbrevs[mood]] if item])} form of *{verb}*."
 
         if show_principal_parts:
             question += f" The principal parts are: {", ".join(verb_pp)}."
 
+        if not st.session_state.question_generation_error_message:
+            st.markdown("### Current question")
 
-        st.markdown("### Current question")
+            with st.form(key="noun_form", clear_on_submit=True):
+                current_answer = st.text_input(question, key="answer_input")
 
-        with st.form(key="noun_form", clear_on_submit=True):
-            current_answer = st.text_input(question, key="answer_input")
-
-            submit_button_col, user_answer_col = st.columns(2)
-            with submit_button_col:
-                answer_submitted = st.form_submit_button("Submit answer")
-                if answer_submitted:
-                    st.session_state.answer_to_check = current_answer.strip().lower()
-            with user_answer_col:
-                if st.session_state.answer_to_check:
-                    st.write("Your answer is: ", st.session_state.answer_to_check)
-
+                submit_button_col, user_answer_col = st.columns(2)
+                with submit_button_col:
+                    answer_submitted = st.form_submit_button("Submit answer")
+                    if answer_submitted:
+                        st.session_state.answer_to_check = current_answer.strip().lower()
+                with user_answer_col:
+                    if st.session_state.answer_to_check:
+                        st.write("Your answer is: ", st.session_state.answer_to_check)
         
 
     ## GENERATE NEW QUESTIONS AND CHECK ANSWERS ##
 
     new_question_col, check_answer_col, score_col = st.columns(3)
 
-    with check_answer_col:
-        # check_answer() defined in utils.py
-        check_answer()
 
+    with check_answer_col:
+        check_answer()
+        
     with new_question_col:
         # new_question() defined in utils.py
         st.button("New Question", on_click=new_question, args=(build_verb,), key="question_button", width="stretch")
-
+        
     with score_col:
         # reset() defined in utils.py
         st.button("Reset Score", "reset", on_click=reset, width="stretch")

@@ -18,6 +18,8 @@ if "answer_checked" not in st.session_state:
     st.session_state["answer_checked"] = False
 if "curr_page_id" not in st.session_state:
     st.session_state["curr_page_id"] = ""
+if "question_generation_error_message" not in st.session_state:
+    st.session_state["question_generation_error_message"] = ""
 
 
 main_page = st.Page("main_page.py", title="Main Page")
