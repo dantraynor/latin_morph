@@ -1,7 +1,14 @@
 import streamlit as st
 import random
-import unicodedata
-from utils import radio_change, reset, check_answer
+from utils import radio_change, reset, check_answer, new_question
+from vocab import import_nouns
+
+page_id = "nouns"
+if page_id != st.session_state.curr_page_id:
+    st.session_state.current_question = []
+    # st.session_state.current_score = 0
+    # st.session_state.total_questions = 0
+st.session_state.curr_page_id = page_id
 
 st.markdown("# Nouns")
 
@@ -9,7 +16,7 @@ declension_dict = {"1st": 1, "2nd":["2_us", "2_er", "2_neut"], "3rd": [3, "3_ist
 
 ## SET OPTIONS ##
 
-col_options, col_declension = st.columns(2)
+col_declension, col_options = st.columns(2)
 
 with col_options:
     st.markdown("Options:")
@@ -171,43 +178,7 @@ noun_endings = {1: {"sg": {"gen": "ae",
                            "voc": None}},
                            }
 
-noun_vocab = {
-                "puella": {"decl": 1,
-                         "stem": "puell"},
-                "puer": {"decl": "2_er",
-                         "stem": "puer"},
-                "servus": {"decl": "2_us",
-                           "stem": "serv"},
-                "agricola": {"decl": 1,
-                             "stem": "agricol"},
-                "cīvis": {"decl": "3_istem",
-                          "stem": "cīv"},
-                "leo": {"decl": 3,
-                        "stem": "leōn"},
-                "manus": {"decl": 4,
-                          "stem": "man"},
-                "senātus": {"decl": 4,
-                            "stem": "senāt"},
-                "rēs": {"decl": "5_consonant",
-                        "stem": "r"},
-                "diēs": {"decl": "5_vowel",
-                         "stem": "di"},
-                "animal": {"decl": "3_istem_neut",
-                           "stem": "animāl"},
-                "mīles": {"decl": 3,
-                          "stem": "mīlit"},
-                "cornū": {"decl": "4_neut",
-                           "stem": "corn"},
-                "nōmen": {"decl": "3_neut",
-                           "stem": "nōmin"},
-                "templum": {"decl": "2_neut",
-                           "stem": "templ"},
-                "ager": {"decl": "2_er",
-                         "stem": "agr"},
-                "equus": {"decl": "2_us",
-                          "stem": "equ"}
-            }
-
+noun_vocab = import_nouns()
 
 # based on radio button 'declension' (which may still need its own key in session_state), filter noun_vocab.
 
@@ -249,7 +220,7 @@ if st.session_state.current_question:
     # st.write(st.session_state.current_question)
     # st.write(f"Give the {noun_options["case"][case]} {noun_options["number"][number]} of *{noun}*.")
 
-    noun_decl = active_vocab[noun]["decl"]
+    noun_decl = active_vocab.get(noun, {}).get("decl")
 
     if case == "nom" and number == "sg":    # nominative singulars don't choose from list
         correct_answer = noun
@@ -326,15 +297,11 @@ with check_answer_col:
     check_answer()
 
 with new_question_col:
-    def new_question():
-        st.session_state.current_question = gen_question()
-#        noun, case, number = st.session_state.current_question
-        st.session_state.answer_checked = False
-        st.session_state.answer_to_check = ""
-    st.button("New Question", on_click=new_question, key="question_button", width="stretch")
+    # new_question() defined in utils.py
+    st.button("New Question", on_click=new_question, args=(gen_question,), key="question_button", width="stretch")
 
 with score_col:
-    # reset() is defined in utils.py
+    # reset() defined in utils.py
     st.button("Reset Score", "reset", on_click=reset, width="stretch")
 
     st.markdown(f"Current score: {st.session_state.current_score} out of {st.session_state.total_questions}")

@@ -1,5 +1,8 @@
 import streamlit as st
 
+page_id = "main_page"
+st.session_state.curr_page_id = page_id
+
 
 st.markdown("""
             # Welcome!

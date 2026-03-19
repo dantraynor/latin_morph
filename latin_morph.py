@@ -15,7 +15,9 @@ if "current_score" not in st.session_state:
 if "total_questions" not in st.session_state:
     st.session_state["total_questions"] = 0
 if "answer_checked" not in st.session_state:
-    st.session_state.answer_checked = False
+    st.session_state["answer_checked"] = False
+if "curr_page_id" not in st.session_state:
+    st.session_state["curr_page_id"] = ""
 
 
 main_page = st.Page("main_page.py", title="Main Page")
