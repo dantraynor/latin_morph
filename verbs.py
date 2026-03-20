@@ -367,7 +367,7 @@ else:
     #    verb = "eō"    ## UNCOMMENT AND SET FOR TESTING
 
         # SET MOOD
-        if verb_vocab[verb].get("no_impv"):
+        if verb_vocab[verb].get("no_impv") and "impv" in mood_list:
             mood_list.pop("impv")
         if not mood_list:
             st.session_state.question_generation_error_message = ":warning: Your selected options have resulted in an impossibility! Try selecting some different or additional options and hit 'New Question' again."
@@ -739,7 +739,7 @@ else:
     if st.session_state.current_question:
         verb_form, verb_id, verb_pp = st.session_state.current_question
         verb, person, number, tense, voice, mood = verb_id.values()
-        verb_pp = list(verb_pp.values())
+        verb_pp = [val for val in verb_pp.values() if val]
 
         correct_answer = verb_form
 
