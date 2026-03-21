@@ -14,6 +14,7 @@ st.markdown("""
             and all four verb moods (indicative, subjunctive, imperative, and infinitive).
 
             🚧 Currently, nouns, verbs, and pronouns are functional. 
-            Next up will be adjectives and adverbs.
+            Next up will be adjectives and adverbs, 
+            as well as streamlining the answer submission/checking process.
 
             """)
