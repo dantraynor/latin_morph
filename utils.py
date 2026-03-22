@@ -65,7 +65,7 @@ def submit_and_check_answer():
     
     if not user_answer: # if an empty form is submitted, don't process the answer or disable the submit button.
         st.session_state.button_disable = False
-        st.session_state.answer_display_message = "Your answer was blank! Enter something and hit 'Check answer' (or press the return key), or click 'New Question' again if you want to skip this one."
+        st.session_state.answer_display_message = "Your answer was blank! Enter something and hit 'Check Answer' (or press the return key), or click 'New Question' again if you want to skip this one."
 
     else:
         st.session_state.button_disable = True

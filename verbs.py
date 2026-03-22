@@ -761,7 +761,7 @@ else:
                     def disable_button():
                             st.session_state.button_disable = True
                     st.form_submit_button(
-                        "Check answer", 
+                        "Check Answer", 
                         key="form_submission_button",
                         on_click=submit_and_check_answer,
                         disabled=st.session_state.button_disable,

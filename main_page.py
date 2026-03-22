@@ -12,9 +12,15 @@ st.markdown("""
             but is not associated with any particular textbook, 
             and unlike the Latin Driller Killer, it has all five noun declensions 
             and all four verb moods (indicative, subjunctive, imperative, and infinitive).
-
-            🚧 Currently, nouns, verbs, and pronouns are functional. 
-            Next up will be adjectives and adverbs, 
-            as well as streamlining the answer submission/checking process.
-
             """)
+
+st.warning("The answer submission process has been streamlined: you now only need to press 'Check Answer' (or hit the Return key) in order to submit and check your answer.")
+
+st.markdown("""
+            :construction:
+            Currently, nouns, verbs, and pronouns are functional. 
+            Next up will be adjectives and adverbs.
+            :construction:
+            
+            """)
+
