@@ -1,5 +1,7 @@
 import streamlit as st
 
+st.set_page_config("Latin Morph!", menu_items={"About": "A pedagogical tool for Latin students at any level to practice creating correct word forms."})
+
 if "enforce_macrons" not in st.session_state:
     st.session_state["enforce_macrons"] = False
 if "current_question" not in st.session_state:
@@ -28,13 +30,15 @@ verbs_page = st.Page("verbs.py", title="Verbs")
 about_page = st.Page("about.py", title="About")
 pronouns_page = st.Page("pronouns.py", title="Pronouns")
 adj_page = st.Page("adjectives.py", title="Adjectives and Adverbs")
-
+test_page = st.Page("button_test.py", title="Test page")
 
 st.markdown("*Use the navigation menu to choose a part of speech to practice.*")
 
 choose_page = st.navigation({"Latin Morph!": [main_page, about_page], 
                              "Parts of Speech (available)": [nouns_page, verbs_page, pronouns_page, ],
-                             "More Parts of Speech (not yet available)": [adj_page]})
+                             "More Parts of Speech (not yet available)": [adj_page],
+                            #  "Test": [test_page]
+                             })
 choose_page.run()
 
 #st.markdown(":copyright: 2026 Darcy Krasne ([CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/))", text_alignment="right")
