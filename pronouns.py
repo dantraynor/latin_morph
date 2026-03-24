@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+import time
 from utils import radio_change, reset, new_question, submit_and_check_answer, clear_page
 from vocab import import_pronouns
 
@@ -17,37 +18,37 @@ pronoun_vocab = import_pronouns()
 
 ## SET OPTIONS ##
 
-pronoun_type_col, options_col = st.columns([2,1], gap="medium")
-# demonstratives
+option_expander = st.expander("Settings", expanded=True)
 
-with pronoun_type_col:
-    demonstratives = st.multiselect("Choose which demonstrative pronouns to practice (they are all selected by default):", 
-                                    options=[k for k,v in pronoun_vocab.items() if v.get("demonstrative")],
-                                    default=[k for k,v in pronoun_vocab.items() if v.get("demonstrative")])
-    # personal pronouns
-    personal_pron = st.multiselect("Choose which personal pronouns to practice:", 
-                                    options=[k for k,v in pronoun_vocab.items() if v.get("pers_pron")],
-                                    default=[k for k,v in pronoun_vocab.items() if v.get("pers_pron")])
-    # relative and interrogative pronouns
-    rel_interr = st.multiselect("Choose which relative and interrogative pronouns to practice:", 
-                                    options=[k for k,v in pronoun_vocab.items() if v.get("rel_interrog")],
-                                    default=[k for k,v in pronoun_vocab.items() if v.get("rel_interrog")])
+with option_expander:
+    pronoun_type_col, options_col = st.columns([2,1], gap="medium")
+    with pronoun_type_col:
+        # demonstratives
+        demonstratives = st.multiselect("Choose which demonstrative pronouns to practice (they are all selected by default):", 
+                                        options=[k for k,v in pronoun_vocab.items() if v.get("demonstrative")],
+                                        default=[k for k,v in pronoun_vocab.items() if v.get("demonstrative")])
+        # personal pronouns
+        personal_pron = st.multiselect("Choose which personal pronouns to practice:", 
+                                        options=[k for k,v in pronoun_vocab.items() if v.get("pers_pron")],
+                                        default=[k for k,v in pronoun_vocab.items() if v.get("pers_pron")])
+        # relative and interrogative pronouns
+        rel_interr = st.multiselect("Choose which relative and interrogative pronouns to practice:", 
+                                        options=[k for k,v in pronoun_vocab.items() if v.get("rel_interrog")],
+                                        default=[k for k,v in pronoun_vocab.items() if v.get("rel_interrog")])
 
-    # if nos or vos selected: option to distinguish between partitive and non-partitive genitive forms of nōs and vōs
-    if any([pn in personal_pron for pn in ["nōs","vōs"]]):
-        gen_forms_diff = st.checkbox("Distinguish between partitive and non-partitive genitive?", help="If this box is selected, you will be asked to provide either the partitive or non-partitive genitive for *nōs* and *vōs*. If not selected, both forms will count as correct.")
+        # if nos or vos selected: option to distinguish between partitive and non-partitive genitive forms of nōs and vōs
+        if any([pn in personal_pron for pn in ["nōs","vōs"]]):
+            gen_forms_diff = st.checkbox("Distinguish between partitive and non-partitive genitive?", help="If this box is selected, you will be asked to provide either the partitive or non-partitive genitive for *nōs* and *vōs*. If not selected, both forms will count as correct.")
 
-with options_col:
-    st.markdown("Options:", help="You can adjust these options at any point.")
-    st.checkbox("Enforce macrons?", help="If this box is selected, macron mistakes will be considered incorrect. If not selected, macrons can be used but will not be evaluated.", key="enforce_macrons")
-    macrons = st.session_state.enforce_macrons
-    if macrons:
-        st.markdown("You can copy and paste letters from here:")
-        st.code("āēīōū", language=None)
+    with options_col:
+        st.markdown("Options:", help="You can adjust these options at any point.")
+        st.checkbox("Enforce macrons?", help="If this box is selected, macron mistakes will be considered incorrect. If not selected, macrons can be used but will not be evaluated.", key="enforce_macrons")
+        macrons = st.session_state.enforce_macrons
+        if macrons:
+            st.markdown("You can copy and paste letters from here:")
+            st.code("āēīōū", language=None)
 
 pron_list = demonstratives+personal_pron+rel_interr
-
-
 
 
 ## FILTER PRONOUNS ##
@@ -99,6 +100,8 @@ def gen_question():
             form = pronoun_vocab[pronoun]["forms"][case]
 
     return [pronoun, case, number, gender]
+
+st.session_state.gen_func = gen_question
 
 if st.session_state.current_question:
     pronoun, case, number, gender = st.session_state.current_question
@@ -185,3 +188,8 @@ else:
     with score_col:
         st.button("Reset Score", "reset", on_click=reset, width="stretch")
         st.markdown(f"Current score: **{st.session_state.current_score}** out of **{st.session_state.total_questions}**")
+
+if st.session_state.auto_advance_trigger and st.session_state.answer_checked:
+    time.sleep(st.session_state.auto_advance)
+    new_question(st.session_state.gen_func)
+    st.rerun()

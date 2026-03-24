@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+import time
 from utils import radio_change, reset, new_question, submit_and_check_answer, clear_page
 from vocab import import_nouns
 
@@ -7,12 +8,6 @@ st.set_page_config("Latin Morph! Nouns")
 
 page_id = "nouns"
 clear_page(page_id)
-# if page_id != st.session_state.curr_page_id:
-#     st.session_state.current_question = []
-#     st.session_state.current_score = 0
-#     st.session_state.total_questions = 0
-#     st.session_state.answer_to_check = ""
-# st.session_state.curr_page_id = page_id
 
 st.markdown("# Nouns")
 
@@ -20,21 +15,25 @@ declension_dict = {"1st": 1, "2nd":["2_us", "2_er", "2_neut"], "3rd": [3, "3_ist
 
 ## SET OPTIONS ##
 
-col_declension, col_options = st.columns(2)
+option_expander = st.expander("Settings", expanded=True)
 
-with col_options:
-    st.markdown("Options:", help="You can adjust these options at any point.")
-    st.checkbox("Enforce macrons?", help="If this box is selected, macron mistakes will be considered incorrect. If not selected, macrons can be used but will not be evaluated.", key="enforce_macrons")
-    macrons = st.session_state.enforce_macrons
-    if macrons:
-        st.markdown("You can copy and paste letters from here:")
-        st.code("āēīōū", language=None)
-    show_declension = st.checkbox("Show declension?", help="Select this box to show the noun's declension.")
-    show_stem = st.checkbox("Show noun stem/base?", help="Select this box to show the noun base. (The base is the stem without any of the trailing vowels that sometimes combine with endings.)")
+with option_expander:
 
-with col_declension:
-    # radio_change() is defined in utils.py
-    declension = st.radio("Choose a declension to practice:",{"random":"random"} | declension_dict, on_change=radio_change)
+    col_declension, col_options = st.columns(2)
+
+    with col_options:
+        st.markdown("Options:", help="You can adjust these options at any point.")
+        st.checkbox("Enforce macrons?", help="If this box is selected, macron mistakes will be considered incorrect. If not selected, macrons can be used but will not be evaluated.", key="enforce_macrons")
+        macrons = st.session_state.enforce_macrons
+        if macrons:
+            st.markdown("You can copy and paste letters from here:")
+            st.code("āēīōū", language=None)
+        show_declension = st.checkbox("Show declension?", help="Select this box to show the noun's declension.")
+        show_stem = st.checkbox("Show noun stem/base?", help="Select this box to show the noun base. (The base is the stem without any of the trailing vowels that sometimes combine with endings.)")
+
+    with col_declension:
+        # radio_change() is defined in utils.py
+        declension = st.radio("Choose a declension to practice:",{"random":"random"} | declension_dict, on_change=radio_change)
 
 
 ## DEFINE AVAILABLE NOUNS AND NOUN ENDINGS ##
@@ -216,6 +215,7 @@ def gen_question():
 
     return [noun, case, number]
 
+st.session_state.gen_func = gen_question
 
 if st.session_state.current_question:
     noun, case, number = st.session_state.current_question
@@ -310,3 +310,8 @@ with results_col:
 with score_col:
     st.button("Reset Score", "reset", on_click=reset, width="stretch")
     st.markdown(f"Current score: **{st.session_state.current_score}** out of **{st.session_state.total_questions}**")
+
+if st.session_state.auto_advance_trigger and st.session_state.answer_checked:
+    time.sleep(st.session_state.auto_advance)
+    new_question(st.session_state.gen_func)
+    st.rerun()

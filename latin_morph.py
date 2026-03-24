@@ -49,6 +49,14 @@ if not "irreg_alert_message" in st.session_state:
 #other
 if "balloons" not in st.session_state:
     st.session_state["balloons"] = False
+if "auto_advance" not in st.session_state:
+    st.session_state.auto_advance = False
+if "auto_advance_trigger" not in st.session_state:
+    st.session_state.auto_advance_trigger = False
+if "gen_func" not in st.session_state:
+    st.session_state.gen_func = ""
+# if "verb_expander" not in st.session_state:
+#     st.session_state["verb_expander"] = True
 
 main_page = st.Page("main_page.py", title="Main Page")
 nouns_page = st.Page("nouns.py", title="Nouns")
@@ -67,6 +75,13 @@ choose_page = st.navigation({"**Latin Morph!**": [main_page, about_page],
                              "Parts of Speech": [nouns_page, verbs_page, pronouns_page, adj_page],
                             #  "Test": [test_page]
                              })
+
+st.sidebar.select_slider("Auto-advance to next question?", 
+                         options=[False] + list(range(5,61)), 
+                         format_func=lambda x: "No" if x is False else str(x)+" sec", 
+                         key="auto_advance", 
+                         help="If you want to automatically advance to the next question after answering, rather than having to click **New Question**, set this to the number of seconds you want to wait before advancing (between 5 and 60 seconds). (You can still skip a question by clicking **New Question**.)")
+
 choose_page.run()
 
 #st.markdown(":copyright: 2026 Darcy Krasne ([CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/))", text_alignment="right")

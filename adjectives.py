@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+import time
 from utils import reset, new_question, submit_and_check_answer, clear_page, remove_macrons
 from vocab import import_adjectives
 
@@ -15,8 +16,6 @@ cons_stems = ["vetus","compos", "dīves", "particeps", "pauper", "prīnceps", "s
 #         adj_vocab[word]["super"] = None
 
 st.markdown("# Adjectives and Adverbs")
-
-# st.write("Eventually this page will allow you to test yourself on the positive, comparative, and superlative forms of adjectives and adverbs.")
 
 st.warning('Because third declension adjectives, in particular, have numerous quirks in their formation, it is possible that there will be some small errors in their generation. If you find any, please fill out the "Latin mistake" part of [this Google form](https://forms.gle/xT8hQ27sjposeXPc9).')
 
@@ -55,59 +54,63 @@ adj_abbrevs = {
     }
 }
 
-adj_options_col,options_col = st.columns([3,2])
+option_expander = st.expander("Settings", expanded=True)
 
-with adj_options_col:
-    # declensions
-    master_decl_list = [(1,2), 3]
-    declension = st.radio("Choose a declension to practice:",
-                          options=["random"]+[decl for decl in master_decl_list], 
-                          format_func=lambda x: ({"random": "Random"} | adj_abbrevs["decl"]).get(x))
-    # degree
-    master_degree_list = list(adj_abbrevs["degree"].keys())
-    degree_list = st.multiselect(
-        "Choose which degrees to include (they are all selected by default):", 
-        [deg for deg in master_degree_list],
-        default=[deg for deg in master_degree_list],
-        format_func=lambda x: adj_abbrevs["degree"].get(x),
-        help='Positive degree refers to "regular" adjectives and adverbs that are neither comparative nor superlative.'
-        )
-    # numerals
-    incl_cardinals = st.checkbox("Include cardinal numbers?", 
-                                 value=True, 
-                                 key="incl_cardinals", 
-                                 help="Select this box to include declinable cardinal numbers (one, two, and three).")
-    # unus nauta adjectives - T/F flag
-    incl_pronominals = False
-    if declension in ["random", (1,2)]:
-        incl_pronominals = st.checkbox("Include pronominal (UNUS NAUTA) adjectives?", 
-                    value=True, 
-                    key="incl_pronominals", 
-                    help="Select this box to include the nine pronominal (so-called UNUS NAUTA) adjectives: *ūnus*, *nūllus*, *ūllus*, *sōlus*, *neuter*, *alter*, *uter*, *tōtus*, *alius*")
-    # non-i-stem 3rd decl. adjectives - T/F flag
-    incl_cons_stems = False
-    if declension in ["random", 3]:
-        incl_cons_stems = st.checkbox("Include non-i-stem 3rd declension adjectives?",
-                                      value=True, key="incl_cons_stems",
-                                      help="Select this box to include 3rd declension adjectives such as *vetus* that do not follow the i-stem pattern for endings.")
-    
-    # adverbs
-    ## MAY NEED TO CHANGE THIS TO ACCOMMODATE ADVERB-ONLY OPTION
-    pos_list = ["adj","adv"]
-    incl_adv = st.checkbox("Include adverbs?", 
-                           value=True, key="incl_adv", 
-                           help="Select this box to include adverbial forms of adjectives; if not selected, you will only be tested on adjectival forms.")
-    if not incl_adv:
-        pos_list = ["adj"]
-with options_col:
-    st.markdown("Options:", help="You can adjust these options at any point.")
-    st.checkbox("Enforce macrons?", help="If this box is selected, macron mistakes will be considered incorrect. If not selected, macrons can be used but will not be evaluated.", key="enforce_macrons")
-    macrons = st.session_state.enforce_macrons
-    if macrons:
-        st.markdown("You can copy and paste letters from here:")
-        st.code("āēīōū", language=None)
-    dictionary_entry = st.checkbox("Show the dictionary entry?", key="dictionary_entry", help="Select this box to see the adjective's nominative singular forms.")
-    irreg_alert = st.checkbox("Show a message if the form or stem is irregular?", key="irreg_alert", help="Select this box to be alerted if a form is irregular or uses an irregular stem.")
+with option_expander:
+
+    adj_options_col,options_col = st.columns([3,2])
+
+    with adj_options_col:
+        # declensions
+        master_decl_list = [(1,2), 3]
+        declension = st.radio("Choose a declension to practice:",
+                            options=["random"]+[decl for decl in master_decl_list], 
+                            format_func=lambda x: ({"random": "Random"} | adj_abbrevs["decl"]).get(x))
+        # degree
+        master_degree_list = list(adj_abbrevs["degree"].keys())
+        degree_list = st.multiselect(
+            "Choose which degrees to include (they are all selected by default):", 
+            [deg for deg in master_degree_list],
+            default=[deg for deg in master_degree_list],
+            format_func=lambda x: adj_abbrevs["degree"].get(x),
+            help='Positive degree refers to "regular" adjectives and adverbs that are neither comparative nor superlative.'
+            )
+        # numerals
+        incl_cardinals = st.checkbox("Include cardinal numbers?", 
+                                    value=True, 
+                                    key="incl_cardinals", 
+                                    help="Select this box to include declinable cardinal numbers (one, two, and three).")
+        # unus nauta adjectives - T/F flag
+        incl_pronominals = False
+        if declension in ["random", (1,2)]:
+            incl_pronominals = st.checkbox("Include pronominal (UNUS NAUTA) adjectives?", 
+                        value=True, 
+                        key="incl_pronominals", 
+                        help="Select this box to include the nine pronominal (so-called UNUS NAUTA) adjectives: *ūnus*, *nūllus*, *ūllus*, *sōlus*, *neuter*, *alter*, *uter*, *tōtus*, *alius*")
+        # non-i-stem 3rd decl. adjectives - T/F flag
+        incl_cons_stems = False
+        if declension in ["random", 3]:
+            incl_cons_stems = st.checkbox("Include non-i-stem 3rd declension adjectives?",
+                                        value=True, key="incl_cons_stems",
+                                        help="Select this box to include 3rd declension adjectives such as *vetus* that do not follow the i-stem pattern for endings.")
+        
+        # adverbs
+        ## MAY NEED TO CHANGE THIS TO ACCOMMODATE ADVERB-ONLY OPTION
+        pos_list = ["adj","adv"]
+        incl_adv = st.checkbox("Include adverbs?", 
+                            value=True, key="incl_adv", 
+                            help="Select this box to include adverbial forms of adjectives; if not selected, you will only be tested on adjectival forms.")
+        if not incl_adv:
+            pos_list = ["adj"]
+    with options_col:
+        st.markdown("Options:", help="You can adjust these options at any point.")
+        st.checkbox("Enforce macrons?", help="If this box is selected, macron mistakes will be considered incorrect. If not selected, macrons can be used but will not be evaluated.", key="enforce_macrons")
+        macrons = st.session_state.enforce_macrons
+        if macrons:
+            st.markdown("You can copy and paste letters from here:")
+            st.code("āēīōū", language=None)
+        dictionary_entry = st.checkbox("Show the dictionary entry?", key="dictionary_entry", help="Select this box to see the adjective's nominative singular forms.")
+        irreg_alert = st.checkbox("Show a message if the form or stem is irregular?", key="irreg_alert", help="Select this box to be alerted if a form is irregular or uses an irregular stem.")
 
 
 
@@ -482,6 +485,8 @@ def create_adj_adv(adj_id=None):
 
     return [correct_form, adj_id, noms]
 
+st.session_state.gen_func = create_adj_adv
+
 ## CREATE QUIZ ##
 
 if not degree_list:
@@ -501,7 +506,7 @@ else:
         # st.write(st.session_state["irreg_alert"])
 
         ## CREATE QUESTION PHRASE ##
-        question = f"Give the {", ".join([item for item in [adj_abbrevs["gender"].get(gender), adj_abbrevs["case"].get(case), adj_abbrevs["number"].get(number)] if item is not None])} {adj_abbrevs["degree"][degree]} {adj_abbrevs["pos"][pos]} of *{adj}*."
+        question = f"Give the {", ".join([item for item in [adj_abbrevs["gender"].get(gender), adj_abbrevs["case"].get(case), adj_abbrevs["number"].get(number)] if item is not None])} {adj_abbrevs["degree"][degree]} {'adverb' if pos == 'adv' else 'form'} of *{adj}*."
         if dictionary_entry is True:
             question += f" The dictionary entry is: *{"*, *".join(noms)}*."
         if irreg_alert is True:
@@ -542,3 +547,10 @@ else:
         st.button("Reset Score", "reset", on_click=reset, width="stretch")
         st.markdown(f"Current score: **{st.session_state.current_score}** out of **{st.session_state.total_questions}**")
 
+#st.write(st.session_state.auto_advance_trigger)
+#st.write(st.session_state.auto_advance)
+#st.write(st.session_state.gen_func)
+if st.session_state.auto_advance_trigger and st.session_state.answer_checked:
+    time.sleep(st.session_state.auto_advance)
+    new_question(st.session_state.gen_func)
+    st.rerun()
