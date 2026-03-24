@@ -11,3 +11,4 @@ st.markdown("""
             You can also subscribe there to find out about major site updates.
             
             """)
+

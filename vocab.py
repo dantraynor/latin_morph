@@ -780,7 +780,11 @@ def import_adjectives():
         # "": {
         #     "stem": "",
         #     "decl": (),
-        #     # "noms": ()
+        #     # "noms": (),
+        #     # "irreg": {
+        #     #     
+        #     # },
+        #     "no_adv": False,
         # },
         "pulcher": {
             "stem": "pulchr",
@@ -788,14 +792,19 @@ def import_adjectives():
         },
         "miser": {
             "stem": "miser",
-            "decl": (1,2)
+            "decl": (1,2),
+            "irreg": {
+                "forms": {
+                    "adv": {"pos": ["miserē", "miseriter"]}
+                }
+            }
         },
         "laetus": {
             "stem": "laet",
             "decl": (1,2)
         },
-        "sanus": {
-            "stem": "san",
+        "sānus": {
+            "stem": "sān",
             "decl": (1,2)
         },
         "vacuus": {
@@ -820,7 +829,7 @@ def import_adjectives():
             "decl": (1,2),
             "irreg": {
                 "stems": {
-                    "comp": "ma",
+                    "comp": "mā",
                     "super": "maxim"
                 },
                 "forms": {
@@ -861,15 +870,22 @@ def import_adjectives():
                 }
             }
         },
-        "acer": {
-            "noms": ("acer", "acris", "acre"),
-            "stem": ("acr"),
+        "ācer": {
+            "noms": ("ācer", "ācris", "ācre"),
+            "stem": ("ācr"),
             "decl": 3
         },
         "celer": {
             "noms": ("celer", "celeris", "celere"),
             "stem": ("celer"),
-            "decl": 3
+            "decl": 3,
+            "irreg": {
+                "forms": {
+                    "pl": {
+                        "gen": ("celerum",)
+                    }
+                }
+            }
         },
         "ingēns": {
             "noms": ("ingēns",),
@@ -905,14 +921,13 @@ def import_adjectives():
         "alius": {
             "pronominal": True,
             "decl": (1,2),
-            "stem": "al",
+            "stem": "ali",
             "irreg": {
                 "forms": {
                     "sg": {
-                        "nom": {
-                            "n": "aliud"
-                        },
-                        "gen": ("alterīus",)
+                        "nom": ("alius", "alia", "aliud"),
+                        "gen": ("alterīus",),
+                        "dat": ("alterī",)
                     },
                     "adv": {
                         "pos": "aliter"
@@ -921,7 +936,6 @@ def import_adjectives():
             }
         },
         "duo": {
-            #"no_adv": True,
             "cardinal": True,
             "decl": None,
             "no_sg": True,
@@ -938,18 +952,35 @@ def import_adjectives():
             }
         },
         "trēs": {
-            #"no_adv": True,
             "cardinal": True,
             "decl": 3,
             "no_sg": True,
-            "stem": "tr"
+            "stem": "tr",
+            "noms": ("trēs", "tria")
         },
         "ūnus": {
-            #"no_adv": True,
             "cardinal": True,
             "pronominal": True,
             "decl": (1,2),
+            "no_pl": True,
             "stem": "ūn"
+        },
+        "vetus": {
+            "cons_stem": True,
+            "decl": 3,
+            "stem": "veter",
+            "noms": ("vetus", "veteris", "vetere"),
+            "irreg": {
+                "stems": {
+                    "comp": "vetust"
+                }
+            }
         }
     }
+
+    for word in adjective_vocab.keys():
+        if adjective_vocab[word].get("cardinal") or adjective_vocab[word].get("pronominal"):
+            adjective_vocab[word]["comp"] = None
+            adjective_vocab[word]["super"] = None
+
     return adjective_vocab

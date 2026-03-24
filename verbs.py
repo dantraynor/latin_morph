@@ -67,11 +67,11 @@ with options_col:
 # with conjugation_col:
 with verb_options_col:
     conjugation_selector = st.multiselect(
-        "Choose which conjugations to include (they are all selected by default):",
+        "Choose which conjugations to practice (they are all selected by default):",
         conjugation_dict.keys(),
         format_func = lambda x: conjugation_dict.get(x),
         default = conjugation_dict.keys(),
-        help = "If no conjugations are chosen, only irregular verbs will be available."
+        help = "If no conjugations are chosen, only irregular verbs will be available. If you just want to practice irregular verbs, unselect all the conjugations."
         )
 
 # with tense_col:
@@ -79,7 +79,7 @@ with verb_options_col:
     tense_dict = {abbrev: name for abbrev, name in zip(master_tense_list,[verb_abbrevs[tns] for tns in master_tense_list])}
 
     tense_selector = st.multiselect(
-        "Choose which tenses to include:",
+        "Choose which tenses to practice:",
         master_tense_list,
         format_func = lambda x: tense_dict[x],
         default=master_tense_list
@@ -89,7 +89,7 @@ with verb_options_col:
     master_voice_list = ["act", "pass", "dep", "semidep"]
     voice_dict = {abbrev: name for abbrev, name in zip(master_voice_list,[verb_abbrevs[vc] for vc in master_voice_list])}
 
-    voice_selector = st.multiselect("Choose which voices and types of verb to include:",
+    voice_selector = st.multiselect("Choose which voices and types of verb to practice:",
                                     master_voice_list,
                                     format_func=lambda x: voice_dict[x],
                                     default = master_voice_list,
@@ -99,7 +99,7 @@ with verb_options_col:
     master_mood_list = ["ind", "subj", "inf", "impv"]
     mood_dict = {abbrev: name for abbrev, name in zip(master_mood_list,[verb_abbrevs[md] for md in master_mood_list])}
 
-    mood_selector = st.multiselect("Choose which moods to include:",
+    mood_selector = st.multiselect("Choose which moods to practice:",
                                 master_mood_list,
                                 format_func=lambda x: mood_dict[x],
                                 default=master_mood_list)
@@ -110,10 +110,10 @@ with verb_options_col:
     master_irregular_verbs_list = [key for key in complete_verb_vocab.keys() if complete_verb_vocab[key].get("irreg")]
     if "dō" in master_irregular_verbs_list:
         master_irregular_verbs_list.remove("dō")
-    irreg_selector = st.multiselect("Choose which irregular verbs to include:",
+    irreg_selector = st.multiselect("Choose which irregular verbs to practice:",
                                     master_irregular_verbs_list,
                                     default=master_irregular_verbs_list,
-                                    help="Selected irregular verbs will be available regardless of any other selections.")
+                                    help="Selected irregular verbs will be available regardless of any other selections. If you just want to practice irregular verbs, unselect all the conjugations.")
 
 
     fut_impv = False
@@ -463,13 +463,13 @@ else:
         return {"verb": verb, "pers": person, "num": number, "tense": tense, "voice": voice, "mood": mood}
 
 
-    def build_verb(id=None):
+    def build_verb(verb_id=None):
         # logic for if verb is regular
 
-        if id is None:
+        if verb_id is None:
             verb_id = gen_verb_id()
         else:
-            verb_id = id
+            verb_id = verb_id
 
         verb = verb_id["verb"]
         person = verb_id["pers"]

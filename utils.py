@@ -13,6 +13,7 @@ def clear_page(page_id):
         st.session_state.result_message = ""
         st.session_state.answer_display_message = ""
     st.session_state.curr_page_id = page_id
+    
 
 
 def radio_change():
@@ -122,6 +123,8 @@ def submit_and_check_answer():
             if correct_flag is True:
                 st.session_state.current_score += 1
                 st.session_state.result_message = "**Good job!**"
+                if st.session_state.balloons is True:
+                    st.balloons()
             else:
                 st.session_state.result_message = "**Incorrect. Better luck next time!**"
 

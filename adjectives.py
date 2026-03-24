@@ -1,25 +1,31 @@
 import streamlit as st
 import random
-from utils import reset, new_question, submit_and_check_answer, clear_page
+from utils import reset, new_question, submit_and_check_answer, clear_page, remove_macrons
 from vocab import import_adjectives
 
 page_id = "adjectives"
 clear_page(page_id)
 
 
-complete_verb_vocab = import_adjectives()
-
+adj_vocab = import_adjectives()
+cons_stems = ["vetus","compos", "dīves", "particeps", "pauper", "prīnceps", "sōspes", "superstes"]
+# for word in adj_vocab.keys():
+#     if adj_vocab[word].get("cardinal") or adj_vocab[word].get("pronominal"):
+#         adj_vocab[word]["comp"] = None
+#         adj_vocab[word]["super"] = None
 
 st.markdown("# Adjectives and Adverbs")
 
-st.write("Eventually this page will allow you to test yourself on the positive, comparative, and superlative forms of adjectives and adverbs.")
+# st.write("Eventually this page will allow you to test yourself on the positive, comparative, and superlative forms of adjectives and adverbs.")
+
+st.warning('Because third declension adjectives, in particular, have numerous quirks in their formation, it is possible that there will be some small errors in their generation. If you find any, please fill out the "Latin mistake" part of [this Google form](https://forms.gle/xT8hQ27sjposeXPc9).')
 
 ## SET OPTIONS ##
 
 adj_abbrevs = {
     "decl": {
-        (1,2): "1st and 2nd",
-        3: "3rd"
+        (1,2): "1st and 2nd declension adjectives",
+        3: "3rd declension adjectives"
     },
     "case": {
         "nom": "nominative",
@@ -49,32 +55,77 @@ adj_abbrevs = {
     }
 }
 
-# declensions
-master_decl_list = [(1,2), 3]
-decl_list = [decl for decl in master_decl_list] # change based on selected options
-# numerals - T/F flag
-incl_cardinals = True
-# unus nauta adjectives - T/F flag
-incl_pronominals = True
-# adverbs
-pos_list = ["adj","adv"]
-incl_adv = True
-if not incl_adv:
-    pos_list = ["adj"]
-# degree
-master_degree_list = list(adj_abbrevs["degree"].keys())
-degree_list = [deg for deg in master_degree_list]   # change based on selected options
+adj_options_col,options_col = st.columns([3,2])
+
+with adj_options_col:
+    # declensions
+    master_decl_list = [(1,2), 3]
+    declension = st.radio("Choose a declension to practice:",
+                          options=["random"]+[decl for decl in master_decl_list], 
+                          format_func=lambda x: ({"random": "Random"} | adj_abbrevs["decl"]).get(x))
+    # degree
+    master_degree_list = list(adj_abbrevs["degree"].keys())
+    degree_list = st.multiselect(
+        "Choose which degrees to include (they are all selected by default):", 
+        [deg for deg in master_degree_list],
+        default=[deg for deg in master_degree_list],
+        format_func=lambda x: adj_abbrevs["degree"].get(x),
+        help='Positive degree refers to "regular" adjectives and adverbs that are neither comparative nor superlative.'
+        )
+    # numerals
+    incl_cardinals = st.checkbox("Include cardinal numbers?", 
+                                 value=True, 
+                                 key="incl_cardinals", 
+                                 help="Select this box to include declinable cardinal numbers (one, two, and three).")
+    # unus nauta adjectives - T/F flag
+    incl_pronominals = False
+    if declension in ["random", (1,2)]:
+        incl_pronominals = st.checkbox("Include pronominal (UNUS NAUTA) adjectives?", 
+                    value=True, 
+                    key="incl_pronominals", 
+                    help="Select this box to include the nine pronominal (so-called UNUS NAUTA) adjectives: *ūnus*, *nūllus*, *ūllus*, *sōlus*, *neuter*, *alter*, *uter*, *tōtus*, *alius*")
+    # non-i-stem 3rd decl. adjectives - T/F flag
+    incl_cons_stems = False
+    if declension in ["random", 3]:
+        incl_cons_stems = st.checkbox("Include non-i-stem 3rd declension adjectives?",
+                                      value=True, key="incl_cons_stems",
+                                      help="Select this box to include 3rd declension adjectives such as *vetus* that do not follow the i-stem pattern for endings.")
+    
+    # adverbs
+    ## MAY NEED TO CHANGE THIS TO ACCOMMODATE ADVERB-ONLY OPTION
+    pos_list = ["adj","adv"]
+    incl_adv = st.checkbox("Include adverbs?", 
+                           value=True, key="incl_adv", 
+                           help="Select this box to include adverbial forms of adjectives; if not selected, you will only be tested on adjectival forms.")
+    if not incl_adv:
+        pos_list = ["adj"]
+with options_col:
+    st.markdown("Options:", help="You can adjust these options at any point.")
+    st.checkbox("Enforce macrons?", help="If this box is selected, macron mistakes will be considered incorrect. If not selected, macrons can be used but will not be evaluated.", key="enforce_macrons")
+    macrons = st.session_state.enforce_macrons
+    if macrons:
+        st.markdown("You can copy and paste letters from here:")
+        st.code("āēīōū", language=None)
+    dictionary_entry = st.checkbox("Show the dictionary entry?", key="dictionary_entry", help="Select this box to see the adjective's nominative singular forms.")
+    irreg_alert = st.checkbox("Show a message if the form or stem is irregular?", key="irreg_alert", help="Select this box to be alerted if a form is irregular or uses an irregular stem.")
+
 
 
 ## DEFINE AVAILABLE ADJECTIVES AND ADJ/ADV ENDINGS ##
 
-adj_vocab = import_adjectives()
-
 select_vocab = {k:v for k,v in adj_vocab.items()}   # limit based on selections
+
 if not incl_cardinals:
-    select_vocab = {k:v for k,v in select_vocab if not v.get("cardinal")}
+    select_vocab = {k:v for k,v in select_vocab.items() if not v.get("cardinal")}
 if not incl_pronominals:
-    select_vocab = {k:v for k,v in select_vocab if not v.get("pronominal")}
+    select_vocab = {k:v for k,v in select_vocab.items() if not v.get("pronominal")}
+if not incl_cons_stems:
+    select_vocab = {k:v for k,v in select_vocab.items() if not v.get("cons_stem")}
+if declension != "random":
+    select_vocab = {k:v for k,v in select_vocab.items() if v.get("decl") == declension}
+    
+
+#st.write(len(select_vocab))
 
 adj_options = {"case": list(adj_abbrevs["case"].keys()),
                 "number": list(adj_abbrevs["number"].keys()),
@@ -92,7 +143,7 @@ adj_endings = {
             "dat": "ae",
             "acc": "am",
             "abl": "ā",
-            "voc": None
+            "voc": "a"
         },
         "pl": {
             "nom": "ae",
@@ -100,7 +151,7 @@ adj_endings = {
             "dat": "īs",
             "acc": "ās",
             "abl": "īs",
-            "voc": None
+            "voc": "ae"
         }
     },
     "2_us": {
@@ -118,11 +169,12 @@ adj_endings = {
             "dat": "īs",
             "acc": "ōs",
             "abl": "īs",
-            "voc": None
+            "voc": "ī"
         }
     },
     "2_er": {
         "sg": {
+            "nom": None,
             "gen": "ī",
             "dat": "ō",
             "acc": "um",
@@ -135,7 +187,7 @@ adj_endings = {
             "dat": "īs",
             "acc": "ōs",
             "abl": "īs",
-            "voc": None
+            "voc": "ī"
         }
     },
     "2_neut": {
@@ -145,7 +197,7 @@ adj_endings = {
             "dat": "ō",
             "acc": "um",
             "abl": "ō",
-            "voc": "e"
+            "voc": "um"
         },
         "pl": {
             "nom": "a",
@@ -153,7 +205,7 @@ adj_endings = {
             "dat": "īs",
             "acc": "a",
             "abl": "īs",
-            "voc": None
+            "voc": "a"
         }
     },
     3: {
@@ -171,7 +223,7 @@ adj_endings = {
             "dat": "ibus",
             "acc": ["īs","ēs"],
             "abl": "ibus",
-            "voc": None
+            "voc": "ēs"
         }
     },
     "3_neut": {
@@ -189,9 +241,38 @@ adj_endings = {
             "dat": "ibus",
             "acc": "ia",
             "abl": "ibus",
-            "voc": None
+            "voc": "ia"
         }
     },
+    "3_reg": {
+        "sg": {
+            "nom": None,
+            "gen": "is",
+            "dat": "ī",
+            "acc": "em",
+            "abl": "e",
+            "voc": None},
+        "pl": {"nom": "ēs",
+                "gen": "um",
+                "dat": "ibus",
+                "acc": "ēs",
+                "abl": "ibus",
+                "voc": "ēs"}},
+    "3_reg_neut": {
+        "sg": {
+            "nom": None,
+            "gen": "is",
+            "dat": "ī",
+            "acc": None,
+            "abl": "e",
+            "voc": None},
+        "pl": {
+            "nom": "a",
+            "gen": "um",
+            "dat": "ibus",
+            "acc": "a",
+            "abl": "ibus",
+            "voc": "a"}},
 }
 
 adv_endings = {
@@ -206,28 +287,258 @@ adv_endings = {
 ## SELECT AND CREATE ADJECTIVE/ADVERB FORMS ##
 
 def gen_adj_adv_id():
-    pos = random.choices(pos_list, [90, 10]) if len(pos_list) == 2 else pos_list[0]
-    if pos == "adv":
-        select_vocab = {k:v for k,v in select_vocab if not (v.get("no_adv") and v.get("cardinal"))}
-    adj = random.choice(list(select_vocab.keys()))
+    # choose adjective or adverb
+    reduced_vocab = {k:v for k,v in select_vocab.items()}
+
+    pos = random.choices(pos_list, [90, 10])[0] if len(pos_list) == 2 else pos_list[0]
+    if pos == "adv": # if adverb, only include words that can have adverbs
+        reduced_vocab = {k:v for k,v in reduced_vocab.items() if not (v.get("no_adv") or v.get("cardinal"))}
+    
     case = None
     number = None
+    gender = None
     if pos != "adv":
-        case = random.choice(list(adj_options["case"].keys()))
-        number = random.choice(list(adj_options["number"].keys()))
+        case = random.choice(adj_options["case"])
+        number = random.choice(adj_options["number"])
+        gender = random.choice(adj_options["gender"])
+    for num in ["sg","pl"]:
+        if number == num:
+            reduced_vocab = {k:v for k,v in reduced_vocab.items() if not v.get(f"no_{num}")}
     degree = random.choice(degree_list)
+    if degree in ["comp","super"]:
+        reduced_vocab = {k:v for k,v in reduced_vocab.items() if v.get("comp", 0) == 0 and v.get("super", 0) == 0}
 
-    return [adj, case, number, pos, degree]
+    adj = random.choice(list(reduced_vocab.keys()))
+    
+    return [adj, case, number, gender, pos, degree]
 
-def create_adj_adv(adj_id):
+def create_adj_adv(adj_id=None):
     if adj_id:
-        id = adj_id
+        adj_id = adj_id
     else:
-        id = gen_adj_adv_id()
-    adj, case, number, pos, degree = id
+        adj_id = gen_adj_adv_id()
+    adj, case, number, gender, pos, degree = adj_id
+#    st.write(adj, case, number, gender, pos, degree)
 
-    adj_info = adj_vocab[adj]
+    adj_info = adj_vocab[adj]   # get the information for the chosen word
+
+    correct_form = ""
+    correct_stem = ""
+    correct_ending = ""
+    st.session_state["irreg_alert_message"] = ""
+    # if word has irregular forms, get the relevant form
+    irreg_forms = adj_info.get("irreg", {}).get("forms", {})
+    irreg_stems = adj_info.get("irreg", {}).get("stems", {})
+
+    # if specified form is the lemma, assign it and be done.
+    if case == "nom" and number == "sg" and gender == "m" and pos == "adj" and degree == "pos":
+        correct_form = adj
+
+    # otherwise, find the form.
+    else:
+        # deal with irregulars
+        if irreg_forms: # if the specified form is irregular, find it.
+            if pos == "adv":
+                correct_form = irreg_forms.get("adv", {}).get(degree)
+            else:
+                if degree == "pos":
+                    correct_form = irreg_forms.get(number, {}).get(case)
+                else:
+                    pass
+                    # update this later to pull a "comp" or "super" key from the irregular forms part of the dictionary. Alternatively, these could possibly go under irregular stems with a "no_infix" T/F flag, in which case that part of the code will need updating.
+            if correct_form:
+                st.session_state["irreg_alert_message"] = "N.B. This form is irregular."
+
+        # deal with regular endings (reg. and irreg. stems)
+        if not correct_form:
+            if irreg_stems: # if the specified form has an irregular stem, get the stem
+                correct_stem = irreg_stems.get(degree)
+            if correct_stem:
+                st.session_state["irreg_alert_message"] = f"N.B. This form has an irregular stem (*{correct_stem}*-)."
+
+            if not correct_form and not correct_stem: # otherwise, get the regular stem
+                correct_stem = adj_info.get("stem")
+            
+            infix = ""
+            if correct_stem: # build correct form on correct stem
+                # assign infix for comparative and superlative
+                # infix = ""  # no infix for positive degree adj. and pos./comp. adverbs
+                if degree == "comp" and pos == "adj":   # comp. adj. have -iōr- infix (deal later with -ior and -ius endings)
+                    infix = "iōr"
+                elif degree == "super": # superl. adj. and adv. all have an infix, except irregulars
+                    if irreg_stems.get("super"):
+                        pass
+                    else:
+                        infix = "issim"
+                        if adj[-2:] == "er":
+                            correct_stem = adj
+                            infix = "rim"
+                        elif adj_info["decl"] == 3 and correct_stem[-2:] == "er":
+                            infix = "rim"
+                        elif adj in ["facilis","difficilis","similis","dissimilis","gracilis","humilis"]:
+                            infix = "lim"
+
+                decl = ""   # prepare to assign declension in order to get correct endings
+
+                if pos == "adv": # build adverbial forms
+                    if degree == "pos":
+                        decl = adj_info["decl"]
+                        correct_ending = adv_endings[degree][decl]
+                        if decl == 3 and correct_stem[-2:] == "nt":
+                            correct_ending = "er" # 3rd decl adjectives with -nt- stems have -ter as adverbial ending
+                    else:
+                        correct_ending = adv_endings[degree]
+                    correct_form = correct_stem + infix + correct_ending
+
+                else: # build adjectival forms
+                    if (adj_info["decl"] == (1,2) and degree == "pos") or degree == "super": # deal with 1st/2nd decl. adjectives and superlatives
+                        if gender == "f":
+                            decl = 1
+                        elif gender == "n":
+                            decl = "2_neut"
+                        else:
+                            if adj[-1] == "r" and degree == "pos":
+                                decl = "2_er"
+                            else:
+                                decl = "2_us"
+                        correct_ending = adj_endings[decl][number][case]
+                        if degree == "pos" and number == "sg" and adj_info.get("pronominal") is True:
+                            if case == "dat":
+                                correct_ending = "ī"
+                            elif case == "gen":
+                                correct_ending = "īus"
+                        correct_form = correct_stem + infix + correct_ending
+                    else: # deal with 3rd decl. adjectives and comparatives
+                        if degree == "pos" and case == "nom" and number == "sg":
+                            correct_form = adj_info["noms"] # assign 3rd. decl. nom. sg. tuple; unpack later
+                        elif adj in cons_stems and degree == "pos": # deal with purely-consonsantal adjectives in positive degree
+                            if gender == "n":
+                                decl = "3_reg_neut"
+                            else:
+                                decl = "3_reg"
+                        elif gender == "n": # N adjectives
+                            if degree == "pos": # positives
+                                decl = "3_neut"
+                            else: # comparatives
+                                decl = "3_reg_neut"
+                                if number == "sg" and case in ["nom","acc","voc"]:
+                                    correct_ending = "ius"
+                                    correct_form = correct_stem + correct_ending
+                        else: # M/F adjectives
+                            if degree == "pos": # positives
+                                decl = 3
+                            else:  # comparatives
+                                decl = "3_reg"
+                                if number == "sg" and case in ["nom", "voc"]:
+                                    infix = remove_macrons(infix)
+
+                        if degree == "comp":
+                            if number == "sg" and case == "abl":
+                                correct_ending = ["ī", "e"]
+                            elif number == "pl" and case == "acc":
+                                correct_ending = ["īs", "ēs"]
+
+                        if not correct_form and not correct_ending:
+                            correct_ending = adj_endings[decl][number][case]
+                            if correct_ending is None and degree == "pos": #
+                                correct_form = adj
+                            else:
+                                if correct_ending is None:
+                                    correct_ending = ""
+                                if isinstance(correct_ending, list):
+                                    correct_form = [correct_stem + infix + end for end in correct_ending]
+                                else:
+                                    correct_form = correct_stem + infix + correct_ending
 
 
+        if isinstance(correct_form, tuple):
+            # neuter is always the last form in the tuple
+            if gender == "n":
+                correct_form = correct_form[-1]
+            # if one- or two-termination, M/F are both the first form
+            elif len(correct_form) in [1,2]:
+                correct_form = correct_form[0]
+            # otherwise, M is the first form, F is the second form
+            else:
+                if gender == "m":
+                    correct_form = correct_form[0]
+                elif gender == "f":
+                    correct_form = correct_form[1]
 
-    return
+    # get/construct nom. sg. forms for dictionary entry
+    irreg_noms = False
+    if irreg_forms:
+        irreg_noms = irreg_forms.get("sg", {}).get("nom")
+        if not irreg_noms:
+            irreg_noms = irreg_forms.get("pl", {}).get("nom")
+    if irreg_noms:
+        noms = irreg_noms
+    elif adj_info.get("noms"):
+        noms = adj_info.get("noms")
+        if len(noms) == 1:
+            noms = [adj] + [adj_info.get("stem")+"is"]
+    else:
+        noms = [adj] + [adj_info["stem"] + ending for ending in ["a", "um"]]
+
+    return [correct_form, adj_id, noms]
+
+## CREATE QUIZ ##
+
+if not degree_list:
+    st.markdown('You need to choose at least one degree. (Choose "positive" if you\'re only familiar with regular adjectives.)')
+# elif not pos_list:
+#     st.markdown("You need to choose at least one part of speech.")
+
+else:
+    question = ""
+    if st.session_state.current_question:
+        correct_form, adj_id, noms = st.session_state.current_question
+        adj, case, number, gender, pos, degree = adj_id
+        
+        st.session_state.correct_answer = correct_form
+        # st.write(adj_id)
+        # st.write(correct_form)
+        # st.write(st.session_state["irreg_alert"])
+
+        ## CREATE QUESTION PHRASE ##
+        question = f"Give the {", ".join([item for item in [adj_abbrevs["gender"].get(gender), adj_abbrevs["case"].get(case), adj_abbrevs["number"].get(number)] if item is not None])} {adj_abbrevs["degree"][degree]} {adj_abbrevs["pos"][pos]} of *{adj}*."
+        if dictionary_entry is True:
+            question += f" The dictionary entry is: *{"*, *".join(noms)}*."
+        if irreg_alert is True:
+            question += f" {st.session_state.irreg_alert_message}"
+
+    ## DISPLAY QUESTION ##
+
+        st.markdown("### Current question")
+
+        with st.form(key="adj_adv_form", clear_on_submit=True):
+            current_answer = st.text_input(question, key="answer_input")
+            
+            submit_button_col, user_answer_col = st.columns([1,2])
+            with submit_button_col:
+                def disable_button():
+                        st.session_state.button_disable = True
+                st.form_submit_button(
+                    "Check Answer", 
+                    key="form_submission_button",
+                    on_click=submit_and_check_answer,
+                    disabled=st.session_state.button_disable,
+                )
+            with user_answer_col:
+                st.markdown(st.session_state.answer_display_message)
+
+
+    ## GENERATE NEW QUESTIONS AND CHECK ANSWERS ##
+
+    new_question_col, results_col, score_col = st.columns(3)
+
+    with new_question_col:
+        st.button("New Question", on_click=new_question, args=(create_adj_adv,), key="question_button", width="stretch")
+
+    with results_col:
+        st.markdown(st.session_state.result_message)    # just write the result message, rather than other things as well.
+
+    with score_col:
+        st.button("Reset Score", "reset", on_click=reset, width="stretch")
+        st.markdown(f"Current score: **{st.session_state.current_score}** out of **{st.session_state.total_questions}**")
+

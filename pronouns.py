@@ -21,15 +21,15 @@ pronoun_type_col, options_col = st.columns([2,1], gap="medium")
 # demonstratives
 
 with pronoun_type_col:
-    demonstratives = st.multiselect("Choose which demonstrative pronouns you want to include (they are all selected by default):", 
+    demonstratives = st.multiselect("Choose which demonstrative pronouns to practice (they are all selected by default):", 
                                     options=[k for k,v in pronoun_vocab.items() if v.get("demonstrative")],
                                     default=[k for k,v in pronoun_vocab.items() if v.get("demonstrative")])
     # personal pronouns
-    personal_pron = st.multiselect("Choose which personal pronouns you want to include:", 
+    personal_pron = st.multiselect("Choose which personal pronouns to practice:", 
                                     options=[k for k,v in pronoun_vocab.items() if v.get("pers_pron")],
                                     default=[k for k,v in pronoun_vocab.items() if v.get("pers_pron")])
     # relative and interrogative pronouns
-    rel_interr = st.multiselect("Choose which relative and interrogative pronouns you want to include:", 
+    rel_interr = st.multiselect("Choose which relative and interrogative pronouns to practice:", 
                                     options=[k for k,v in pronoun_vocab.items() if v.get("rel_interrog")],
                                     default=[k for k,v in pronoun_vocab.items() if v.get("rel_interrog")])
 

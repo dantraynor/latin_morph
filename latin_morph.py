@@ -6,6 +6,7 @@ st.set_page_config("Latin Morph!",
                         }
                     )
 
+# every page
 if "enforce_macrons" not in st.session_state:
     st.session_state["enforce_macrons"] = False
 if "current_question" not in st.session_state:
@@ -34,7 +35,20 @@ if "button_disable" not in st.session_state:
     st.session_state["button_disable"] = False
 if "answer_display_message" not in st.session_state:
     st.session_state["answer_display_message"] = ""
-
+#adjectives
+# if not "incl_cardinals" in st.session_state:
+#     st.session_state["incl_cardinals"] = True
+# if not "incl_pronominals" in st.session_state:
+#     st.session_state["incl_pronominals"] = True
+# if not "dictionary_entry" in st.session_state:
+#     st.session_state["dictionary_entry"] = False
+# if not "irreg_alert" in st.session_state:
+#     st.session_state["irreg_alert"] = False
+if not "irreg_alert_message" in st.session_state:
+    st.session_state["irreg_alert_message"] = ""
+#other
+if "balloons" not in st.session_state:
+    st.session_state["balloons"] = False
 
 main_page = st.Page("main_page.py", title="Main Page")
 nouns_page = st.Page("nouns.py", title="Nouns")
@@ -46,9 +60,11 @@ adj_page = st.Page("adjectives.py", title="Adjectives and Adverbs")
 
 st.markdown("*Use the navigation menu to choose a part of speech to practice.*")
 
-choose_page = st.navigation({"Latin Morph!": [main_page, about_page], 
-                             "Parts of Speech (available)": [nouns_page, verbs_page, pronouns_page, ],
-                             "More Parts of Speech (not yet available)": [adj_page],
+## currently disabled because it jumps the page to the top every time the balloons are triggered
+# st.sidebar.checkbox("I like balloons!", key="balloons", help="Select this if you want to see celebratory balloons every time you get an answer right!")
+
+choose_page = st.navigation({"**Latin Morph!**": [main_page, about_page], 
+                             "Parts of Speech": [nouns_page, verbs_page, pronouns_page, adj_page],
                             #  "Test": [test_page]
                              })
 choose_page.run()
