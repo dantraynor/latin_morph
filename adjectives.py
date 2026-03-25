@@ -4,6 +4,10 @@ import time
 from utils import reset, new_question, submit_and_check_answer, clear_page, remove_macrons
 from vocab import import_adjectives
 
+questions_asked = st.session_state.question_list
+
+st.set_page_config("Latin Morph! Adjectives and Adverbs")
+
 page_id = "adjectives"
 clear_page(page_id)
 
@@ -302,6 +306,7 @@ def gen_adj_adv_id():
     gender = None
     if pos != "adv":
         case = random.choice(adj_options["case"])
+        case = "voc"
         number = random.choice(adj_options["number"])
         gender = random.choice(adj_options["gender"])
     for num in ["sg","pl"]:
@@ -444,7 +449,7 @@ def create_adj_adv(adj_id=None):
                         if not correct_form and not correct_ending:
                             correct_ending = adj_endings[decl][number][case]
                             if correct_ending is None and degree == "pos": #
-                                correct_form = adj
+                                correct_form = adj_info["noms"]
                             else:
                                 if correct_ending is None:
                                     correct_ending = ""
@@ -482,6 +487,21 @@ def create_adj_adv(adj_id=None):
             noms = [adj] + [adj_info.get("stem")+"is"]
     else:
         noms = [adj] + [adj_info["stem"] + ending for ending in ["a", "um"]]
+
+
+    curr_question = {
+            "pos": "adj",
+            "word": adj, 
+            "id": adj_id,
+#            "correct": False
+        }
+
+    if st.session_state.append_answer is True:
+        questions_asked.append(
+            curr_question
+        )
+        st.session_state.append_answer = False    
+
 
     return [correct_form, adj_id, noms]
 

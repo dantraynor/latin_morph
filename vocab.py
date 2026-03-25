@@ -969,7 +969,7 @@ def import_adjectives():
             "cons_stem": True,
             "decl": 3,
             "stem": "veter",
-            "noms": ("vetus", "veteris", "vetere"),
+            "noms": ("vetus",),
             "irreg": {
                 "stems": {
                     "comp": "vetust"

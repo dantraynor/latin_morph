@@ -23,6 +23,8 @@ if "total_questions" not in st.session_state:
     st.session_state["total_questions"] = 0
 if "answer_checked" not in st.session_state:
     st.session_state["answer_checked"] = False
+if "append_answer" not in st.session_state:
+    st.session_state["append_answer"] = True
 if "curr_page_id" not in st.session_state:
     st.session_state["curr_page_id"] = ""
 if "question_generation_error_message" not in st.session_state:
@@ -57,6 +59,10 @@ if "gen_func" not in st.session_state:
     st.session_state.gen_func = ""
 # if "verb_expander" not in st.session_state:
 #     st.session_state["verb_expander"] = True
+if "question_list" not in st.session_state:
+    st.session_state["question_list"] = []
+if "store_questions" not in st.session_state:
+    st.session_state["store_questions"] = [item for item in st.session_state.question_list]
 
 main_page = st.Page("main_page.py", title="Main Page")
 nouns_page = st.Page("nouns.py", title="Nouns")
