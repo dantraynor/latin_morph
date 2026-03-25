@@ -45,6 +45,7 @@ def new_question(gen_question):
     st.session_state.result_message = ""
     st.session_state.answer_display_message = ""
     st.session_state.button_disable = False
+    st.session_state.append_answer = True
     # except:
     #     # st.write("Your selected options have resulted in an impossibility: try selecting some additional options.")
     #     st.write("Something went wrong.")
@@ -130,7 +131,10 @@ def submit_and_check_answer():
             else:
                 st.session_state.result_message = "**Incorrect. Better luck next time!**"
     
+            st.session_state.question_list[-1]["correct"] = correct_flag  # write correctness to question_list
+
     if st.session_state.auto_advance:
         st.session_state.auto_advance_trigger = True        
     else:
         st.session_state.auto_advance_trigger = False
+    

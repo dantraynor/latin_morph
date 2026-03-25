@@ -4,6 +4,9 @@ import time
 from utils import radio_change, reset, new_question, submit_and_check_answer, clear_page
 from vocab import import_pronouns
 
+# if st.session_state.question_list :
+questions_asked = st.session_state.question_list
+
 st.set_page_config("Latin Morph! Pronouns")
                    
 page_id = "pronouns"
@@ -147,8 +150,25 @@ if st.session_state.current_question:
     # st.write("correct form:",correct_form)
     st.session_state.correct_answer = correct_form
 
+    curr_question = {
+            "pos": "pronoun",
+            "word": pronoun, 
+            "id": {
+                "case": case,
+                "number": number,
+                "gender": gender
+            },
+#            "correct": False
+        }
+
+    if st.session_state.append_answer is True:
+        questions_asked.append(
+            curr_question
+        )
+        st.session_state.append_answer = False    
+
 ## CREATE QUESTION PHRASE ##
-    question = f"Give the {", ".join([item for item in [abbrevs["gender"].get(gender), abbrevs["number"].get(number), gen_string if gen_string else abbrevs["case"].get(case)] if item is not None])} of *{pronoun}*"
+    question = f"For *{pronoun}*, give the **{", ".join([item for item in [abbrevs["gender"].get(gender), abbrevs["number"].get(number), gen_string if gen_string else abbrevs["case"].get(case)] if item is not None])}**."
 
 ## DISPLAY QUESTION ##
 

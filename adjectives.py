@@ -528,7 +528,7 @@ else:
         # st.write(st.session_state["irreg_alert"])
 
         ## CREATE QUESTION PHRASE ##
-        question = f"For *{adj}*, give the {adj_abbrevs["degree"][degree]} {'adverb' if pos == 'adv' else 'form in the '}{", ".join([item for item in [adj_abbrevs["gender"].get(gender), adj_abbrevs["case"].get(case), adj_abbrevs["number"].get(number)] if item is not None])}."
+        question = f"For *{adj}*, give the **{adj_abbrevs["degree"][degree]}** {'**adverb' if pos == 'adv' else 'form in the **'}{", ".join([item for item in [adj_abbrevs["gender"].get(gender), adj_abbrevs["case"].get(case), adj_abbrevs["number"].get(number)] if item is not None])}**."
         if dictionary_entry is True:
             question += f" The dictionary entry is: *{"*, *".join(noms)}*."
         if irreg_alert is True:

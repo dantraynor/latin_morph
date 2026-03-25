@@ -4,6 +4,10 @@ import time
 from utils import radio_change, reset, new_question, submit_and_check_answer, clear_page
 from vocab import import_nouns
 
+
+# if st.session_state.question_list:
+questions_asked = st.session_state.question_list
+
 st.set_page_config("Latin Morph! Nouns")
 
 page_id = "nouns"
@@ -206,12 +210,13 @@ else:
 
 ## CREATE THE QUIZ ##
 
-questions_asked = []
-
 def gen_question():
     noun = random.choice(list(active_vocab.keys()))
-    case = random.choice(list(noun_options["case"].keys()))
     number = random.choice(list(noun_options["number"].keys()))
+    if number == "sg":
+        case = random.choices(list(noun_options["case"].keys()),[10,90,90,90,90,90])[0]
+    else:
+        case = random.choice(list(noun_options["case"].keys()))
 
     return [noun, case, number]
 
@@ -248,9 +253,7 @@ if st.session_state.current_question:
 
     st.session_state["correct_answer"] = correct_answer
 
-    questions_asked.append([noun, case, number])
-
-    question = f"Give the {noun_options["case"][case]} {noun_options["number"][number]} of *{noun}*."
+    question = f"For *{noun}*, give the **{noun_options["case"][case]} {noun_options["number"][number]}**."
 
     if show_declension:
         for key, val in declension_dict.items():
@@ -296,6 +299,21 @@ if st.session_state.current_question:
         with user_answer_col:
             st.markdown(st.session_state.answer_display_message)
 
+    curr_question = {
+            "pos": "noun",
+            "word": noun, 
+            "id": {
+                "case": case,
+                "number": number
+            },
+#            "correct": False
+        }
+
+    if st.session_state.append_answer is True:
+        questions_asked.append(
+            curr_question
+        )
+        st.session_state.append_answer = False
 
 ## GENERATE NEW QUESTIONS AND CHECK ANSWERS ##
 
@@ -315,3 +333,5 @@ if st.session_state.auto_advance_trigger and st.session_state.answer_checked:
     time.sleep(st.session_state.auto_advance)
     new_question(st.session_state.gen_func)
     st.rerun()
+
+#st.write(questions_asked)
