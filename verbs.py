@@ -4,11 +4,13 @@ import time
 from utils import radio_change, reset, new_question, remove_macrons, submit_and_check_answer, clear_page
 from vocab import import_verbs
 
+# if st.session_state.question_list:
+questions_asked = st.session_state.question_list
+
 st.set_page_config("Latin Morph! Verbs")
 
 page_id = "verbs"
 clear_page(page_id)
-
 
 complete_verb_vocab = import_verbs()
 pres_sys = ["pres","fut","impf"]
@@ -730,13 +732,26 @@ else:
 
         # st.write("Principal parts:", ", ".join([str(val) for val in list(verb_principal_parts.values())]))
         # st.write("Verb form:", verb_form)
+
+        curr_question = {
+                "pos": "verb",
+                "word": verb, 
+                "id": {k:v for k,v in verb_id.items() if k != "verb"} | {"conj": conj}
+            }
+
+        if st.session_state.append_answer is True:
+            questions_asked.append(
+                curr_question
+            )
+            st.session_state.append_answer = False
+
         return [verb_form, verb_id, verb_principal_parts]
 
     st.session_state.gen_func = build_verb
 
     # CREATE QUIZ
 
-    questions_asked = []
+    # questions_asked = []
 
     if st.session_state.current_question:
         verb_form, verb_id, verb_pp = st.session_state.current_question
@@ -747,9 +762,9 @@ else:
 
         st.session_state["correct_answer"] = correct_answer
 
-        questions_asked.append(verb_id)
+        # questions_asked.append(verb_id)
 
-        question = f"Give the {", ".join([item for item in [verb_abbrevs.get(person)+" person" if person else "", verb_abbrevs.get(number) if number else "", verb_abbrevs[tense], verb_abbrevs[voice] if voice != "dep" else "", verb_abbrevs[mood]] if item])} form of *{verb}*."
+        question = f"For ***{verb}***, give the **{" ".join([item for item in [verb_abbrevs[tense], verb_abbrevs[voice] if voice != "dep" else "", verb_abbrevs[mood]] if item])}**{" in the " if mood != "inf" else ""}**{" ".join([item for item in [verb_abbrevs.get(person)+" person" if person else "", verb_abbrevs.get(number) if number else ""] if item])}**."
 
         if show_principal_parts:
             question += f" The principal parts are: {", ".join(verb_pp)}."
@@ -793,3 +808,5 @@ if st.session_state.auto_advance_trigger and st.session_state.answer_checked:
     time.sleep(st.session_state.auto_advance)
     new_question(st.session_state.gen_func)
     st.rerun()
+
+# st.write(questions_asked)

@@ -330,7 +330,7 @@ def create_adj_adv(adj_id=None):
 #    st.write(adj, case, number, gender, pos, degree)
 
     adj_info = adj_vocab[adj]   # get the information for the chosen word
-    st.write(adj_info)
+    #st.write(adj_info)
 
     correct_form = ""
     correct_stem = ""
