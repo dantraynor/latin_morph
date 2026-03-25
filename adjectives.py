@@ -313,6 +313,7 @@ def gen_adj_adv_id():
         if number == num:
             reduced_vocab = {k:v for k,v in reduced_vocab.items() if not v.get(f"no_{num}")}
     degree = random.choice(degree_list)
+    #degree = "comp"
     if degree in ["comp","super"]:
         reduced_vocab = {k:v for k,v in reduced_vocab.items() if v.get("comp", 0) == 0 and v.get("super", 0) == 0}
 
@@ -329,6 +330,7 @@ def create_adj_adv(adj_id=None):
 #    st.write(adj, case, number, gender, pos, degree)
 
     adj_info = adj_vocab[adj]   # get the information for the chosen word
+    st.write(adj_info)
 
     correct_form = ""
     correct_stem = ""
@@ -364,99 +366,100 @@ def create_adj_adv(adj_id=None):
             if correct_stem:
                 st.session_state["irreg_alert_message"] = f"N.B. This form has an irregular stem (*{correct_stem}*-)."
 
-            if not correct_form and not correct_stem: # otherwise, get the regular stem
+            else: # otherwise, get the regular stem
                 correct_stem = adj_info.get("stem")
             
             infix = ""
-            if correct_stem: # build correct form on correct stem
+            # if correct_stem: # build correct form on correct stem
                 # assign infix for comparative and superlative
                 # infix = ""  # no infix for positive degree adj. and pos./comp. adverbs
-                if degree == "comp" and pos == "adj":   # comp. adj. have -iōr- infix (deal later with -ior and -ius endings)
-                    infix = "iōr"
-                elif degree == "super": # superl. adj. and adv. all have an infix, except irregulars
-                    if irreg_stems.get("super"):
-                        pass
+            if degree == "comp" and pos == "adj":   # comp. adj. have -iōr- infix (deal later with -ior and -ius endings)
+                infix = "iōr"
+            elif degree == "super": # superl. adj. and adv. all have an infix, except irregulars
+                if irreg_stems.get("super"):
+                    pass
+                else:
+                    infix = "issim"
+                    if adj[-2:] == "er":
+                        correct_stem = adj
+                        infix = "rim"
+                    elif adj_info["decl"] == 3 and correct_stem[-2:] == "er":
+                        infix = "rim"
+                    elif adj in ["facilis","difficilis","similis","dissimilis","gracilis","humilis"]:
+                        infix = "lim"
+
+            decl = ""   # prepare to assign declension in order to get correct endings
+
+            if pos == "adv": # build adverbial forms
+                if degree == "pos":
+                    decl = adj_info["decl"]
+                    correct_ending = adv_endings[degree][decl]
+                    if decl == 3 and correct_stem[-2:] == "nt":
+                        correct_ending = "er" # 3rd decl adjectives with -nt- stems have -ter as adverbial ending
+                else:
+                    correct_ending = adv_endings[degree]
+                correct_form = correct_stem + infix + correct_ending
+
+            else: # build adjectival forms
+                if (adj_info["decl"] == (1,2) and degree == "pos") or degree == "super": # deal with 1st/2nd decl. adjectives and superlatives
+                    if gender == "f":
+                        decl = 1
+                    elif gender == "n":
+                        decl = "2_neut"
                     else:
-                        infix = "issim"
-                        if adj[-2:] == "er":
-                            correct_stem = adj
-                            infix = "rim"
-                        elif adj_info["decl"] == 3 and correct_stem[-2:] == "er":
-                            infix = "rim"
-                        elif adj in ["facilis","difficilis","similis","dissimilis","gracilis","humilis"]:
-                            infix = "lim"
-
-                decl = ""   # prepare to assign declension in order to get correct endings
-
-                if pos == "adv": # build adverbial forms
-                    if degree == "pos":
-                        decl = adj_info["decl"]
-                        correct_ending = adv_endings[degree][decl]
-                        if decl == 3 and correct_stem[-2:] == "nt":
-                            correct_ending = "er" # 3rd decl adjectives with -nt- stems have -ter as adverbial ending
-                    else:
-                        correct_ending = adv_endings[degree]
-                    correct_form = correct_stem + infix + correct_ending
-
-                else: # build adjectival forms
-                    if (adj_info["decl"] == (1,2) and degree == "pos") or degree == "super": # deal with 1st/2nd decl. adjectives and superlatives
-                        if gender == "f":
-                            decl = 1
-                        elif gender == "n":
-                            decl = "2_neut"
+                        if adj[-1] == "r" and degree == "pos":
+                            decl = "2_er"
                         else:
-                            if adj[-1] == "r" and degree == "pos":
-                                decl = "2_er"
-                            else:
-                                decl = "2_us"
+                            decl = "2_us"
+                    correct_ending = adj_endings[decl][number][case]
+                    if degree == "pos" and number == "sg" and adj_info.get("pronominal") is True:
+                        if case == "dat":
+                            correct_ending = "ī"
+                        elif case == "gen":
+                            correct_ending = "īus"
+                    correct_form = correct_stem + infix + correct_ending
+                else: # deal with 3rd decl. adjectives and comparatives
+                    if degree == "pos" and case == "nom" and number == "sg":
+                        correct_form = adj_info["noms"] # assign 3rd. decl. nom. sg. tuple; unpack later
+                    elif adj in cons_stems and degree == "pos": # deal with purely-consonsantal adjectives in positive degree
+                        if gender == "n":
+                            decl = "3_reg_neut"
+                        else:
+                            decl = "3_reg"
+                    elif gender == "n": # N adjectives
+                        if degree == "pos": # positives
+                            decl = "3_neut"
+                        else: # comparatives
+                            decl = "3_reg_neut"
+                            if number == "sg" and case in ["nom","acc","voc"]:
+                                correct_ending = "ius"
+                                correct_form = correct_stem + correct_ending
+                    else: # M/F adjectives
+                        if degree == "pos": # positives
+                            decl = 3
+                        else:  # comparatives
+                            decl = "3_reg"
+                            if number == "sg" and case in ["nom", "voc"]:
+                                infix = remove_macrons(infix)
+
+                    if degree == "comp":
+                        if number == "sg" and case == "abl":
+                            correct_ending = ["ī", "e"]
+                        elif number == "pl" and case == "acc" and gender in ["m","f"]:
+                            correct_ending = ["īs", "ēs"]
+
+                    if not correct_form and not correct_ending:
                         correct_ending = adj_endings[decl][number][case]
-                        if degree == "pos" and number == "sg" and adj_info.get("pronominal") is True:
-                            if case == "dat":
-                                correct_ending = "ī"
-                            elif case == "gen":
-                                correct_ending = "īus"
-                        correct_form = correct_stem + infix + correct_ending
-                    else: # deal with 3rd decl. adjectives and comparatives
-                        if degree == "pos" and case == "nom" and number == "sg":
-                            correct_form = adj_info["noms"] # assign 3rd. decl. nom. sg. tuple; unpack later
-                        elif adj in cons_stems and degree == "pos": # deal with purely-consonsantal adjectives in positive degree
-                            if gender == "n":
-                                decl = "3_reg_neut"
-                            else:
-                                decl = "3_reg"
-                        elif gender == "n": # N adjectives
-                            if degree == "pos": # positives
-                                decl = "3_neut"
-                            else: # comparatives
-                                decl = "3_reg_neut"
-                                if number == "sg" and case in ["nom","acc","voc"]:
-                                    correct_ending = "ius"
-                                    correct_form = correct_stem + correct_ending
-                        else: # M/F adjectives
-                            if degree == "pos": # positives
-                                decl = 3
-                            else:  # comparatives
-                                decl = "3_reg"
-                                if number == "sg" and case in ["nom", "voc"]:
-                                    infix = remove_macrons(infix)
-
-                        if degree == "comp":
-                            if number == "sg" and case == "abl":
-                                correct_ending = ["ī", "e"]
-                            elif number == "pl" and case == "acc":
-                                correct_ending = ["īs", "ēs"]
-
-                        if not correct_form and not correct_ending:
-                            correct_ending = adj_endings[decl][number][case]
-                            if correct_ending is None and degree == "pos": #
-                                correct_form = adj_info["noms"]
-                            else:
-                                if correct_ending is None:
-                                    correct_ending = ""
-                                if isinstance(correct_ending, list):
-                                    correct_form = [correct_stem + infix + end for end in correct_ending]
-                                else:
-                                    correct_form = correct_stem + infix + correct_ending
+                        if correct_ending is None and degree == "pos": #
+                            correct_form = adj_info["noms"]
+                        else:
+                            if correct_ending is None:
+                                correct_ending = ""
+        if not correct_form:
+            if isinstance(correct_ending, list):
+                correct_form = [correct_stem + infix + end for end in correct_ending]
+            else:
+                correct_form = correct_stem + infix + correct_ending
 
 
         if isinstance(correct_form, tuple):
@@ -502,7 +505,6 @@ def create_adj_adv(adj_id=None):
         )
         st.session_state.append_answer = False    
 
-
     return [correct_form, adj_id, noms]
 
 st.session_state.gen_func = create_adj_adv
@@ -526,7 +528,7 @@ else:
         # st.write(st.session_state["irreg_alert"])
 
         ## CREATE QUESTION PHRASE ##
-        question = f"Give the {", ".join([item for item in [adj_abbrevs["gender"].get(gender), adj_abbrevs["case"].get(case), adj_abbrevs["number"].get(number)] if item is not None])} {adj_abbrevs["degree"][degree]} {'adverb' if pos == 'adv' else 'form'} of *{adj}*."
+        question = f"For *{adj}*, give the {adj_abbrevs["degree"][degree]} {'adverb' if pos == 'adv' else 'form in the '}{", ".join([item for item in [adj_abbrevs["gender"].get(gender), adj_abbrevs["case"].get(case), adj_abbrevs["number"].get(number)] if item is not None])}."
         if dictionary_entry is True:
             question += f" The dictionary entry is: *{"*, *".join(noms)}*."
         if irreg_alert is True:
