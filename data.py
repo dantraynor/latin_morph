@@ -28,9 +28,9 @@ if st.session_state.question_list:
     for title, pos in zip(["Nouns","Verbs","Pronouns","Adjectives","Adverbs"],["noun", "verb", "pronoun", "adj", "adv"]):
         df = pd.json_normalize([item for item in st.session_state.question_list if item.get("correct",None) is not None and item["pos"] == pos])
         if len(df) > 0:
-            correct_col = df.correct
-            answer_col = df.answer
-            df = df.copy().drop(["answer","correct"], axis=1).join(answer_col).astype(str).join(correct_col) \
+            correct_col = df["correct"]
+            answer_col = df["answer"]
+            df = df.copy().drop(["answer","correct"], axis=1, errors="ignore").join(answer_col).astype(str).join(correct_col) \
                 .drop("id", axis=1, errors="ignore") \
                 .replace({None: "-", pd.NA: "-", "nan": "-", "None": "-"}) \
                 .drop("pos", axis=1)
