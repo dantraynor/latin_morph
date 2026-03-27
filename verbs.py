@@ -736,7 +736,7 @@ else:
         curr_question = {
                 "pos": "verb",
                 "word": verb, 
-                "id": {k:v for k,v in verb_id.items() if k != "verb"} | {"conj": str(conj)}
+                "id": {k:str(v) if v is not None else v for k,v in verb_id.items() if k != "verb"} | {"conj": str(conj)}
             }
 
         if st.session_state.append_answer is True:
