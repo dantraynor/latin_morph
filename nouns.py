@@ -305,7 +305,7 @@ if st.session_state.current_question:
             "id": {
                 "case": case,
                 "num": number,
-                "decle": "1st" if str(noun_decl)[0] == "1" else "2nd" if str(noun_decl)[0] == "2" else "3rd (i-stem)" if "istem" in str(noun_decl) else "3rd" if str(noun_decl)[0] == "3" else "4th" if str(noun_decl)[0] == "4" else "5th"
+                "decl": "1st" if str(noun_decl)[0] == "1" else "2nd" if str(noun_decl)[0] == "2" else "3rd (i-stem)" if "istem" in str(noun_decl) else "3rd" if str(noun_decl)[0] == "3" else "4th" if str(noun_decl)[0] == "4" else "5th"
             },
 #            "correct": False
         }
