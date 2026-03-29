@@ -10,7 +10,7 @@ question_list = st.session_state.question_list
 verb_vocab = import_verbs()
 irreg_verbs = list({k:v for k,v in verb_vocab.items() if v.get("irreg")}.keys())
 
-@st.cache_data
+#@st.cache_data
 def analyze_question_data(question_list):
 
     df_dict = {}
