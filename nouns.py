@@ -213,7 +213,10 @@ if len(declension) == 0 and not st.session_state.current_question:
     st.write("You need to choose at least one declension.")
 else:
     def gen_question():
-        last_question = st.session_state.question_list[-1]
+        if len(st.session_state.question_list) > 0:
+            last_question = st.session_state.question_list[-1]
+        else:
+            last_question = {}
         decl_rand = random.choice(declension)
         decl_dict_subset = declension_dict.get(decl_rand)
         # st.write(decl_dict_subset)
@@ -233,9 +236,10 @@ else:
         else:
             case_weights = [90,90,90,90,90,10]
         case = ""
-        if noun_vocab[noun]["decl"] == last_question["id"].get("decl") and number == last_question["id"].get("num"):
-            case = last_question["id"].get("case")
-        while case == "" or case == last_question["id"].get("case"):
+        if last_question:
+            if noun_vocab[noun]["decl"] == last_question["id"].get("decl") and number == last_question["id"].get("num"):
+                case = last_question["id"].get("case")
+        while case == "" or case == last_question.get("id", {}).get("case"):
             case = random.choices(list(noun_options["case"].keys()),case_weights)[0]
 
         # st.write(noun, case, number)
