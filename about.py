@@ -17,3 +17,16 @@ st.markdown("""
             
             """)
 
+st.markdown("""
+            ### Bibliography
+
+            Generally speaking, information on irregular forms and non-standard patterns was taken from 
+            [Allen & Greenough](https://dcc.dickinson.edu/allen-greenough/) and/or [Bennett](https://www.thelatinlibrary.com/bennett.html). 
+            Extremely rare forms (such as the dative and genitive singular of *vīs*) are (for the most part) simply not requested, unless taught by standard textbooks; 
+            and rare or late *alternatives* are usually not included as possible answers.
+
+            In addition, however, the following were consulted for some very particular issues:
+
+            - Dickey, E. (2000) "O dee ree PIE: The Vocative Problems of Latin Words Ending in -eus," *Glotta* 76: 32-49
+            - Rauk, J. (1997) "The Vocative of Deus and Its Problems," *Classical Philology* 92: 138-149
+            """)

@@ -4,11 +4,11 @@ import time
 from utils import radio_change, reset, new_question, submit_and_check_answer, clear_page
 from vocab import import_pronouns
 
+st.set_page_config("Latin Morph! Pronouns", layout="centered")
+                   
 # if st.session_state.question_list :
 questions_asked = st.session_state.question_list
 
-st.set_page_config("Latin Morph! Pronouns", layout="centered")
-                   
 page_id = "pronouns"
 clear_page(page_id)
 

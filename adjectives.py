@@ -4,9 +4,9 @@ import time
 from utils import reset, new_question, submit_and_check_answer, clear_page, remove_macrons
 from vocab import import_adjectives
 
-questions_asked = st.session_state.question_list
-
 st.set_page_config("Latin Morph! Adjectives and Adverbs", layout="centered")
+
+questions_asked = st.session_state.question_list
 
 page_id = "adjectives"
 clear_page(page_id)
@@ -88,7 +88,8 @@ with option_expander:
         cardinal_radio = "No"
         if incl_cardinals:
             cardinal_radio = st.radio("Include *only* cardinal numbers?",
-                                      options = ["No","Yes"], horizontal=True)
+                                      options = ["No","Yes"], horizontal=True,
+                                      help="If 'Yes' is selected, then degree is ignored since numbers have no comparative or superlative forms.")
             cardinal_select = st.multiselect("Choose which numbers to include:", 
                                              options={k:v for k,v in adj_vocab.items() if v.get("cardinal")}.keys(),
                                              default={k:v for k,v in adj_vocab.items() if v.get("cardinal")}.keys(),
@@ -139,11 +140,11 @@ if not incl_cardinals:
     select_vocab = {k:v for k,v in select_vocab.items() if not v.get("cardinal")}
 else:
     for cardinal in {k:v for k,v in adj_vocab.items() if v.get("cardinal")}.keys():
-        if cardinal not in cardinal_select and cardinal in select_vocab.keys():
+        if cardinal not in cardinal_select and cardinal in select_vocab:
             select_vocab.pop(cardinal)
 if not incl_pronominals:
     select_vocab = {k:v for k,v in select_vocab.items() if not v.get("pronominal")}
-if "ūnus" not in select_vocab.keys():
+if "ūnus" not in select_vocab:
     if ("ūnus" in cardinal_select and declension != 3) or incl_pronominals:
         select_vocab["ūnus"] = adj_vocab.get("ūnus")
 if not incl_cons_stems:

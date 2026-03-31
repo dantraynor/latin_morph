@@ -4,10 +4,10 @@ import time
 from utils import radio_change, reset, new_question, remove_macrons, submit_and_check_answer, clear_page
 from vocab import import_verbs
 
+st.set_page_config("Latin Morph! Verbs", layout="centered")
+
 # if st.session_state.question_list:
 questions_asked = st.session_state.question_list
-
-st.set_page_config("Latin Morph! Verbs", layout="centered")
 
 page_id = "verbs"
 clear_page(page_id)
