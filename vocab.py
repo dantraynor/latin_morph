@@ -1,6 +1,6 @@
 import streamlit as st
 
-@st.cache_data
+#@st.cache_data
 def import_verbs():
     verb_vocab = {
         "sum": {
@@ -534,7 +534,7 @@ def import_verbs():
     return verb_vocab
 
 
-@st.cache_data
+#@st.cache_data
 def import_nouns():
     noun_vocab = {
                 "puella": {"decl": 1,
@@ -618,7 +618,7 @@ def import_nouns():
             }
     return noun_vocab
 
-@st.cache_data
+#@st.cache_data
 def import_pronouns():
     pronoun_vocab = {
         "hic": {
@@ -821,7 +821,7 @@ def import_pronouns():
     }
     return pronoun_vocab
 
-@st.cache_data
+#@st.cache_data
 def import_adjectives():
     adjective_vocab = {
         # "": {
