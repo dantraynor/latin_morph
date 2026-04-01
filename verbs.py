@@ -113,7 +113,7 @@ with option_expander:
 
     # with irreg_col:
         #master_irregular_verbs_list = ["sum", "possum", "eō", "ferō", "fīō", "volō", "nōlō", "mālō"]
-        master_irregular_verbs_list = [key for key in complete_verb_vocab.keys() if complete_verb_vocab[key].get("irreg")]
+        master_irregular_verbs_list = [key for key in complete_verb_vocab.keys() if "irreg" in complete_verb_vocab[key]]
         if "dō" in master_irregular_verbs_list:
             master_irregular_verbs_list.remove("dō")
         irreg_selector = st.multiselect("Choose which irregular verbs to practice:",
@@ -388,7 +388,7 @@ else:
             for tns in ["impf","plupf","fut_pf"]:
                 if tns in tense_list:
                     tense_list.remove(tns)
-            if not (verb_vocab[verb].get("ppp") or verb_vocab[verb].get("fap")):
+            if not (verb_vocab[verb].get("ppp") or verb_vocab[verb].get("fap")) and "fut" in tense_list:
                 tense_list.remove("fut")
         # if not tense_list:
         #     st.session_state.question_generation_error_message = ":warning: Your selected options have resulted in an impossibility! Try selecting some different options and hit 'New Question' again."
@@ -666,11 +666,12 @@ else:
                 else:
                     # active voice
                     if voice == "act":
+                        alt_form = ""
                         verb_stem = verb_vocab[verb].get("perf")
                         perf_act_inf = verb_form = verb_stem + "isse"
-                        if mood == "inf":
-                            verb_form = perf_act_inf
-                        else:
+                        if mood != "inf":
+                        #     verb_form = perf_act_inf
+                        # else:
                             if mood == "subj" and tense == "plupf":
                                 verb_form = perf_act_inf
                                 if person == 2 or (person == 1 and number == "pl"):
@@ -683,6 +684,46 @@ else:
                                     verb_form = [verb_stem + ending for ending in verb_ending]
                                 else:
                                     verb_form = verb_stem + verb_ending
+                    
+                        # construct alternative 4th conj. perfect forms
+                        if verb_stem[-2:] == "īv":
+                            # if verb_stem[-2] in ["ā","ē","ō"]:
+                            #     alt_stem = verb_stem[:-1]
+                            # elif verb_stem[2] == "ī":
+                            alt_stem = verb_stem[:-2] + "i"
+                            if mood == "inf" or (mood == "subj" and tense == "plupf"):
+                                alt_form = alt_stem + "isse"
+                            if mood != "inf":
+                                if alt_form:
+                                    if person == 2 or (person == 1 and number == "pl"):
+                                        alt_form = alt_form[:-1] + "ē"
+                                    alt_form = alt_form + verb_endings["pres"]["act"].get(number).get(person)
+                                else:
+                                    verb_ending = verb_endings.get(tense,{}).get(voice,{}).get(mood, {}).get(number, {}).get(person)
+                                    if isinstance(verb_ending, list):
+                                        alt_form = [alt_stem + ending for ending in verb_ending]
+                                    else:
+                                        alt_form = alt_stem + verb_ending
+                            if isinstance(alt_form, list):
+                                for form in list(alt_form):
+                                    if "iis" in form:
+                                        alt_form.append(form.replace("iis", "īs"))
+                            else:
+                                if "iis" in alt_form:
+                                    alt_form = [alt_form, alt_form.replace("iis", "īs")]
+
+                        if alt_form:
+                            if isinstance(verb_form, list):
+                                if isinstance(alt_form, list):
+                                    verb_form = verb_form + alt_form
+                                else:
+                                    verb_form.append(alt_form)
+                            else:
+                                if isinstance(alt_form, list):
+                                    verb_form = [verb_form] + alt_form
+                                else:
+                                    verb_form = [verb_form, alt_form]
+
                     # passive or deponent voice
                     else:
                         verb_stem = verb_vocab[verb].get("ppp")
