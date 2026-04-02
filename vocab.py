@@ -5,6 +5,7 @@ def import_verbs():
     verb_vocab = {
         "sum": {
             "voice": "act",
+            "no_pass": True,
             "conj": None,
             "irreg": {
                 "forms": {
@@ -81,6 +82,7 @@ def import_verbs():
             "voice": "act",
             "conj": None,
             "no_impv": True,
+            "no_pass": True,
             "irreg": {
                 "forms": {
                     "pres": {
@@ -159,7 +161,7 @@ def import_verbs():
                             "ind": {
                                 "sg": {
                                     1: "feror",
-                                    2: "ferris",
+                                    2: ["ferris", "ferre"],
                                     3: "fertur"
                                     },
                                 "pl": {
@@ -282,6 +284,7 @@ def import_verbs():
         },
         "volō": {
             "voice": "act",
+            "no_pass": True,
             "conj": 3,
             "no_impv": True,
             "irreg": {
@@ -323,6 +326,7 @@ def import_verbs():
         },
         "nōlō": {
             "voice": "act",
+            "no_pass": True,
             "conj": 3,
             "irreg": {
                 "forms": {
@@ -381,6 +385,7 @@ def import_verbs():
         },
         "mālō": {
             "voice": "act",
+            "no_pass": True,
             "conj": 3,
             "no_impv": True,
             "irreg": {

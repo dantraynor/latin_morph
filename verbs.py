@@ -119,7 +119,7 @@ with option_expander:
         irreg_selector = st.multiselect("Choose which irregular verbs to practice:",
                                         master_irregular_verbs_list,
                                         default=master_irregular_verbs_list,
-                                        help="Selected irregular verbs will be available regardless of any other selections. If you just want to practice irregular verbs, unselect all the conjugations.")
+                                        help="Selected irregular verbs will be available regardless of which conjugations are selected above. If you just want to practice irregular verbs, unselect all the conjugations.")
 
 
         fut_impv = False
@@ -342,26 +342,31 @@ verb_vocab = {key: val for key, val in complete_verb_vocab.items()}
 for vb in master_irregular_verbs_list:
     if vb not in irreg_selector:
         verb_vocab.pop(vb)
-for feature, feature_list in zip(["voice","conj"],[voice_selector,conjugation_selector + [None]]):
-    verb_vocab = {key: val for key, val in verb_vocab.items() if (verb_vocab[key][feature] in feature_list) or (key in irreg_selector)}
-if "act" not in voice_selector:
-    verb_vocab = {key: val for key, val in verb_vocab.items() if not verb_vocab[key].get("impers_pass_only")}
+# for feature, feature_list in zip(["voice","conj"],[voice_selector,conjugation_selector + [None]]):
+#     verb_vocab = {key: val for key, val in verb_vocab.items() if (verb_vocab[key][feature] in feature_list) or (key in irreg_selector)}
+verb_vocab = {key: val for key,val in verb_vocab.items() if verb_vocab[key]["voice"] in voice_selector or ("pass" in voice_selector and verb_vocab[key]["voice"] == "act" and "no_pass" not in verb_vocab[key])}
+verb_vocab = {key: val for key, val in verb_vocab.items() if verb_vocab[key]["conj"] in conjugation_selector + [None] or key in irreg_selector}
+# if "act" not in voice_selector:
+#     verb_vocab = {key: val for key, val in verb_vocab.items() if not (verb_vocab[key].get("impers_pass_only") or verb_vocab[key].get("no_pass"))}
 if mood_selector == ["impv"]:
     verb_vocab = {key: val for key, val in verb_vocab.items() if not verb_vocab[key].get("no_impv")}
 if mood_selector == ["inf"] and tense_list == ["fut"]:
     verb_vocab = {key: val for key, val in verb_vocab.items() if "ppp" in val or "fap" in val}
 
-if len(verb_vocab) == 0:
-    st.write("Based on your selections, there are no available verbs to generate forms for.")
-elif len(tense_list) == 0:
+st.write(verb_vocab.keys())
+
+if len(tense_list) == 0:
     st.write("You need to choose at least one tense.")
 elif len(voice_selector) == 0:
     st.write("You need to choose at least one voice.")
 elif len(mood_selector) == 0:
     st.write("You need to choose at least one mood.")
 #    st.session_state.question_generation_error_message = ""
-elif len(mood_list) == 0:
-    st.write("Based on your selections, it is not possible to generate any valid verb forms.")
+elif len(verb_vocab) == 0:
+    st.write("Based on your selections, there are no available verbs to generate forms for.")
+# elif len(mood_list) == 0:
+#     st.write("Based on your selections, it is not possible to generate any valid verb forms.")
+
 # elif (list(mood_list.keys()) == ["inf"] and tense_list == ["fut"] and all([x is None for x in [item.get("ppp") for item in verb_vocab.values()]] + [x is None for x in [item.get("fap") for item in verb_vocab.values()]])):
 #     st.write("Based on your selections, it is not possible to generate any valid verb forms.")
 
@@ -369,7 +374,7 @@ else:
     def gen_verb_id():
         st.session_state.question_generation_error_message = ""
         verb = random.choice(list(verb_vocab.keys()))
-    #    verb = "eō"    ## UNCOMMENT AND SET FOR TESTING
+     #    verb = "eō"    ## UNCOMMENT AND SET FOR TESTING
 
         # SET MOOD
         if verb_vocab[verb].get("no_impv") and "impv" in mood_list:
@@ -378,7 +383,7 @@ else:
             st.session_state.question_generation_error_message = ":warning: Your selected options have resulted in an impossibility! Try selecting some different or additional options and hit 'New Question' again."
 
         mood = random.choices(list(mood_list.keys()), list(mood_list.values()))[0]
-    #    mood = "ind"    ## UNCOMMENT AND SET FOR TESTING
+     #    mood = "ind"    ## UNCOMMENT AND SET FOR TESTING
         
         # SET TENSE
         # limit tense options depending on mood
@@ -406,7 +411,7 @@ else:
                 tense = "pres"
         else:
             tense = random.choice(tense_list)
-    #    tense = "fut"    ## UNCOMMENT AND SET FOR TESTING
+     #    tense = "fut"    ## UNCOMMENT AND SET FOR TESTING
 
         # SET PERSON AND NUMBER
         ## only if mood isn't infinitive; limit for imperative
@@ -448,7 +453,7 @@ else:
                     voice = random.choices(list(act_pass_choice_dict.keys()), list(act_pass_choice_dict.values()))[0]
                 elif act_pass_choice_dict:
                     voice = list(act_pass_choice_dict.keys())[0]
-                if voice == "pass":
+                if voice == "pass" and mood != "inf":
                     person = 3
                     number = "sg"
             elif verb in irreg_selector and not act_pass_choice_dict:
@@ -534,13 +539,13 @@ else:
 
         # If the pres. inf. isn't irregular, form it for the principal parts.
         pres_act_inf = ""
+        if verb == "fīō":
+            pres_act_inf = "fiere"
         
         if not pres_inf:
             pres_stem = verb_vocab[verb].get("pres")
             thematic_vowel = verb_vowels["pres"]["inf"].get(conj)
             pres_act_inf = pres_stem + thematic_vowel + "re"
-            if verb == "fīō":
-                pres_act_inf = "fiere"
             if verb_vocab[verb]["voice"] in ["act","semidep"]:
                 pres_inf = pres_act_inf
             if verb_vocab[verb]["voice"] == "dep":
