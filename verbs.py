@@ -348,7 +348,8 @@ if "act" not in voice_selector:
     verb_vocab = {key: val for key, val in verb_vocab.items() if not verb_vocab[key].get("impers_pass_only")}
 if mood_selector == ["impv"]:
     verb_vocab = {key: val for key, val in verb_vocab.items() if not verb_vocab[key].get("no_impv")}
-
+if mood_selector == ["inf"] and tense_list == ["fut"]:
+    verb_vocab = {key: val for key, val in verb_vocab.items() if "ppp" in val or "fap" in val}
 
 if len(verb_vocab) == 0:
     st.write("Based on your selections, there are no available verbs to generate forms for.")
@@ -361,9 +362,10 @@ elif len(mood_selector) == 0:
 #    st.session_state.question_generation_error_message = ""
 elif len(mood_list) == 0:
     st.write("Based on your selections, it is not possible to generate any valid verb forms.")
+# elif (list(mood_list.keys()) == ["inf"] and tense_list == ["fut"] and all([x is None for x in [item.get("ppp") for item in verb_vocab.values()]] + [x is None for x in [item.get("fap") for item in verb_vocab.values()]])):
+#     st.write("Based on your selections, it is not possible to generate any valid verb forms.")
 
 else:
-
     def gen_verb_id():
         st.session_state.question_generation_error_message = ""
         verb = random.choice(list(verb_vocab.keys()))
@@ -789,6 +791,10 @@ else:
                 "word": verb, 
                 "id": {k:str(v) if v is not None else v for k,v in verb_id.items() if k != "verb"} | {"conj": str(conj)} | {"irreg": "irreg" if irreg_form is True else None}
             }
+        if verb in ["volō","nōlō","mālō"]:
+            curr_question["id"]["conj"] = "-"
+        elif verb == "fīō":
+            curr_question["id"]["conj"] = "3io"
         
 #        st.write(st.session_state.append_answer)
         if st.session_state.append_answer is True:
@@ -811,6 +817,8 @@ else:
         verb_form, verb_id, verb_pp = st.session_state.current_question
         verb, person, number, tense, voice, mood = verb_id.values()
         verb_pp = [val for val in verb_pp.values() if val]
+        if verb == "eō":
+            verb_pp[2] += "/iī"
 
         correct_answer = verb_form
 
