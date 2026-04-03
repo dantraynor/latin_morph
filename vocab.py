@@ -932,6 +932,46 @@ def import_nouns():
                 "fidēs": {"decl": "5_consonant", "stem": "fid"},
                 "spēs": {"decl": "5_consonant", "stem": "sp"},
 
+    ## Irregular nouns
+                "vīs": {
+                    "decl": "3_istem",
+                    "stem": "vī(r)",
+                    "irreg": {
+                        "irreg": True,
+                        "sg": {
+                            "gen": None,
+                            "dat": None,
+                            "acc": "vim",
+                            "abl": "vī",
+                            "voc": None
+                        },
+                        "pl": {
+                            "nom": "vīrēs",
+                            "gen": "vīrium",
+                            "dat": "vīribus",
+                            "acc": ["vīrēs","vīrīs"],
+                            "abl": "vīribus",
+                            "voc": None
+                        }
+                    }
+                },
+                "deus": {
+                    "decl": "2_us",
+                    "stem": "de",
+                    "irreg": {
+                        "irreg": True,
+                        "sg": {
+                            "voc": ["deus", "dīve"]
+                        },
+                        "pl": {
+                            "nom": ["dī", "deī", "diī"],
+                            "gen": ["deum", "deōrum"],
+                            "dat": ["dīs", "deīs", "diīs"],
+                            "abl": ["dīs", "deīs", "diīs"],
+                            "voc": "dī"
+                        }
+                    }
+                }
             }
     return noun_vocab
 
