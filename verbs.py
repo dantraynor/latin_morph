@@ -481,12 +481,16 @@ else:
     def build_verb(verb_id=None):
         # logic for if verb is regular
 
-        if verb_id is None:
-            verb_id = gen_verb_id()
+        if verb_id:
+            pass
         else:
-            verb_id = verb_id
-
+            i = 0
+            while verb_id is None and i < 5:
+                verb_id = gen_verb_id()
+                i += 1
+    
         if verb_id is None:
+            st.session_state.question_generation_error_message = ":warning: I'm having trouble generating a question for you based on your selected options; I suggest you make some changes and hit 'New Question' again."
             return
 
         verb = verb_id["verb"]
@@ -801,7 +805,7 @@ else:
                 "word": verb, 
                 "id": {k:str(v) if v is not None else v for k,v in verb_id.items() if k != "verb"} | {"conj": str(conj)} | {"irreg": "irreg" if irreg_form is True else None}
             }
-        if verb in ["volō","nōlō","mālō"]:
+        if verb in ["volō","nōlō","mālō"] and irreg_form is True:
             curr_question["id"]["conj"] = "-"
         elif verb == "fīō":
             curr_question["id"]["conj"] = "3io"

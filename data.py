@@ -118,8 +118,12 @@ if question_list:
         st.markdown("### Verbs")
         st.dataframe(
             df_dict["verb"].copy() \
-                .assign(conj_mod = lambda df: df["conj"].where(~((df["word"].isin(irreg_verbs)) & (df["tense"].isin(["pres","impf","fut"]))), df["word"]+" (pres. system)")) \
-                .groupby(["conj_mod","tense","voice","mood"])["correct"].agg(Total= "count", Correct= "sum").assign(pct=lambda df: df["Correct"]/df["Total"]), 
+                .assign(conj_mod = lambda df: df["conj"].where(~(df["word"].isin({k:v for k,v in verb_vocab.items() if v.get("voice") == "semidep"})), df["conj"]+' (semi-dep.)')) \
+                .assign(conj_mod = lambda df: df["conj_mod"].where(~((df["word"].isin(irreg_verbs)) & (df["irreg"] != "-")), df["word"]+" (irreg.)")) \
+                #.assign(conj_mod = lambda df: df["conj_mod"].where(~(df["conj_mod"] == "-"), df["word"]))
+                .groupby(["conj_mod","tense","voice","mood"])["correct"] \
+                .agg(Total= "count", Correct= "sum") \
+                .assign(pct=lambda df: df["Correct"]/df["Total"]), 
             column_config={
                 "conj_mod": st.column_config.TextColumn("Conjugation/Irreg. Verb", width=None),
                 "tense": st.column_config.TextColumn("Tense", width=None),
