@@ -14,6 +14,8 @@ clear_page(page_id)
 
 st.markdown("# Pronouns")
 
+st.warning('If you come across any incorrectly generated forms, please fill out the "Latin mistake" part of [this Google form](https://forms.gle/xT8hQ27sjposeXPc9).')
+
 ## IMPORT PRONOUNS ##
 
 pronoun_vocab = import_pronouns()

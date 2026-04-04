@@ -14,6 +14,11 @@ clear_page(page_id)
 
 complete_verb_vocab = import_verbs()
 
+st.title("""Verbal Adjectives""")
+st.html('<h1 style="margin-top: -0.3em; margin-bottom: -0.2em;">Participles and Gerundives</h1>')
+
+st.warning('If you come across any incorrectly generated forms, please fill out the "Latin mistake" part of [this Google form](https://forms.gle/xT8hQ27sjposeXPc9).')
+
 ## SET OPTIONS ##
 
 adj_abbrevs = {
@@ -177,9 +182,6 @@ adj_endings = {
         }
     },
 }
-
-st.title("""Verbal Adjectives""")
-st.html('<h1 style="margin-top: -0.3em;">Participles and Gerundives</h1>')
 
 conjugation_dict = {1: "1st", 
                     2: "2nd", 
