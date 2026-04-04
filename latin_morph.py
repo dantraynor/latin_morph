@@ -83,12 +83,16 @@ st.markdown("*Use the navigation menu to choose a part of speech to practice.*")
 # st.sidebar.checkbox("I like balloons!", key="balloons", help="Select this if you want to see celebratory balloons every time you get an answer right!")
 
 choose_page = st.navigation({"**Latin Morph!**": [main_page, about_page], 
-                             "Parts of Speech": [nouns_page, verbs_page, 
-                                                 verbal_adj_page, 
-                                                 pronouns_page, adj_page],
+                            "Parts of Speech": [
+                                nouns_page, 
+                                verbs_page, 
+                                adj_page,
+                                verbal_adj_page, 
+                                pronouns_page, 
+                            ],
                             #  "Test": [test_page],
                             "Tools": [data_page]
-                             })
+                            })
 
 st.sidebar.select_slider("Auto-advance to next question?", 
                          options=[False] + list(range(5,61)), 
