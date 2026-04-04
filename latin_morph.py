@@ -68,11 +68,12 @@ if "cons_u_normalize" not in st.session_state:
     st.session_state["cons_u_normalize"] = False
 
 main_page = st.Page("main_page.py", title="Main Page")
+about_page = st.Page("about.py", title="About")
 nouns_page = st.Page("nouns.py", title="Nouns")
 verbs_page = st.Page("verbs.py", title="Verbs")
-about_page = st.Page("about.py", title="About")
 pronouns_page = st.Page("pronouns.py", title="Pronouns")
 adj_page = st.Page("adjectives.py", title="Adjectives and Adverbs")
+verbal_adj_page = st.Page("verbal_adj.py", title="Verbal Adjectives")
 # test_page = st.Page("button_test.py", title="Test page")
 data_page = st.Page("data.py", title="Session Stats & Data")
 
@@ -82,7 +83,9 @@ st.markdown("*Use the navigation menu to choose a part of speech to practice.*")
 # st.sidebar.checkbox("I like balloons!", key="balloons", help="Select this if you want to see celebratory balloons every time you get an answer right!")
 
 choose_page = st.navigation({"**Latin Morph!**": [main_page, about_page], 
-                             "Parts of Speech": [nouns_page, verbs_page, pronouns_page, adj_page],
+                             "Parts of Speech": [nouns_page, verbs_page, 
+                                                 verbal_adj_page, 
+                                                 pronouns_page, adj_page],
                             #  "Test": [test_page],
                             "Tools": [data_page]
                              })

@@ -13,7 +13,7 @@ irreg_verbs = list({k:v for k,v in verb_vocab.items() if v.get("irreg")}.keys())
 def analyze_question_data(question_list):
 
     df_dict = {}
-    for pos in ["noun", "verb", "pronoun", "adj", "adv"]:
+    for pos in ["noun", "verb", "pronoun", "adj", "adv", "verbal adj."]:
         df = pd.json_normalize([item for item in question_list if "correct" in item and item["pos"] == pos])
         if len(df) > 0:
             correct_col = df["correct"]
@@ -87,10 +87,14 @@ if question_list:
 
     df_dict = analyze_question_data(question_list)
 
-    for title, pos in zip(["Nouns","Verbs","Pronouns","Adjectives","Adverbs"],["noun", "verb", "pronoun", "adj", "adv"]):
+    for title, pos in zip(["Nouns","Verbs","Pronouns","Adjectives","Adverbs", "Verbal Adjectives"],["noun", "verb", "pronoun", "adj", "adv", "verbal adj."]):
         if pos in df_dict:
             df = df_dict[pos]
-            st.markdown(f"### {title}")
+            st.markdown(f"### {title}", help="""fap = future participle  
+                                            pap = present participle  
+                                            ppp = perfect participle  
+                                            gdv = gerundive
+                                            """ if pos == "verbal adj." else None)
             st.dataframe(df,
                             column_config={
                                 k:v for k,v in zip(df.columns, df.columns.str.title())
@@ -202,5 +206,25 @@ if question_list:
             width="content"
         )
 
+    if "verbal adj." in df_dict:
+        st.markdown("### Verbal Adjectives (Participles and Gerundives)")
+        st.dataframe(
+            df_dict["verbal adj."].copy() \
+                #.assign(ptc_type = lambda df: df["ptc_type"].str.upper()) \
+                .assign(ptc_type = lambda df: df["ptc_type"].where(df["ptc_type"] != "fap", "future ptc.")) \
+                .assign(ptc_type = lambda df: df["ptc_type"].where(df["ptc_type"] != "pap", "present ptc.")) \
+                .assign(ptc_type = lambda df: df["ptc_type"].where(df["ptc_type"] != "ppp", "perfect ptc.")) \
+                .assign(ptc_type = lambda df: df["ptc_type"].where(df["ptc_type"] != "gdv", "gerundive")) \
+                .assign(ptc_type = lambda df: df["ptc_type"].where((df["irreg"] != "irreg"), df["ptc_type"] +' (irreg.)')) \
+                .groupby("ptc_type")["correct"].agg(Total= "count", Correct= "sum") \
+                .assign(pct=lambda df: df["Correct"]/df["Total"]),
+            column_config = {
+                "ptc_type": st.column_config.TextColumn("Type of Verbal Adj."),
+                "Total": st.column_config.NumberColumn("Total Questions", width=None),
+                "Correct": st.column_config.NumberColumn("Correct Answers", width=None),
+                "pct": st.column_config.NumberColumn("Percent Correct", format="percent", width=None),
+            },
+            width="content"
+        )
 
 # st.session_state.question_list
