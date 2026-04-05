@@ -133,7 +133,7 @@ def gen_question():
             # st.write(pronoun)
             word_weight = pronoun_df_wrong_indiv.query("weight >= .58").xs(pronoun,level="word")["weight"] if not pronoun_df_wrong_indiv.query("weight >= .58").empty else None
             if word_weight is not None:
-                pronoun_id = pronoun_df_wrong_indiv.query("weight >= .58").xs(pronoun,level="word")["weight"].sample(n=1, weights=word_weight).index[0] if not pronoun_df_wrong_indiv.query("weight >= .58").empty else None
+                pronoun_id = word_weight.sample(n=1, weights=word_weight).index[0]
                 # st.write(pronoun_id)
                 if pronoun_id is not None:
                     pronoun_id = [item if item != "-" else None for item in pronoun_id]
@@ -144,8 +144,6 @@ def gen_question():
                         case = case.split()[0]
                         # if gen_type == "part":
                         #     part_gen = True
-            else:
-                pronoun = ""
 
     if not pronoun or pronoun in recent_words:
         pronoun = random.choice(list(selected_pronouns.keys()))
